@@ -1,4 +1,9 @@
-export type ApiMode = 'openai-completions' | 'openai-responses' | 'anthropic-messages';
+export type ApiMode =
+  | 'openai-completions'
+  | 'openai-responses'
+  | 'anthropic-messages'
+  | 'google-generative-ai'
+  | 'mistral-conversations';
 export interface Provider {
   id: string;
   name: string;
@@ -8,6 +13,12 @@ export interface Provider {
   contextWindow: number;
   maxTokens: number;
   hasKey: boolean;
+  presetId?: string;
+  authMethod?: import('./providers.js').AuthMethod;
+  billing?: import('./providers.js').BillingMode;
+  reasoning?: boolean;
+  vision?: boolean;
+  accountLabel?: string;
 }
 export interface Project {
   id: string;

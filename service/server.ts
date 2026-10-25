@@ -14,8 +14,10 @@ import { registerOverview } from './routes/overview.js';
 import { registerProjects } from './routes/projects.js';
 import { registerProviders } from './routes/providers.js';
 import { registerSessions } from './routes/sessions.js';
+import { registerResearch } from './routes/research.js';
 import { createScheduler } from './scheduler.js';
 import { Store } from './store.js';
+import { recoverExecutionEvents } from './research/recovery.js';
 export async function createServer(options: {
   dataDir: string;
   token: string;
@@ -40,6 +42,7 @@ export async function createServer(options: {
   const agent = new ResearchAgent(store, jobs, secrets, options.dataDir, changed);
   await jobs.recover();
   await agent.recover();
+  await recoverExecutionEvents(store);
   await registerSecurity(app, options.token);
   registerEvents(app, events);
   const context = { app, store, jobs, agent, secrets, changed };
@@ -51,6 +54,7 @@ export async function createServer(options: {
   registerJobs(context);
   registerMemories(context);
   registerAutomations(context);
+  registerResearch(context);
   const scheduler = createScheduler(store, agent, options.scheduler !== false);
   app.addHook('preClose', async () => {
     if (changeTimer) clearTimeout(changeTimer);

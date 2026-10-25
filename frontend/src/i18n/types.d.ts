@@ -6,6 +6,10 @@ declare module 'i18next' {
   interface CustomTypeOptions {
     defaultNS: 'translation';
     keySeparator: false;
-    resources: { translation: typeof zh; service: typeof service };
+    resources: {
+      translation: typeof zh;
+      service: typeof service;
+      settings: typeof import('./settings/zh-CN.json');
+    };
   }
 }

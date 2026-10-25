@@ -7,3 +7,7 @@
 @import "./styles/messages.css";
 @import "./styles/dialogs.css";
 @import "./styles/utilities.css";
+@import "./styles/research.css";
+@import "./styles/settings.css";
+@import "./styles/settings-layout.css";
+@import "./styles/connection-editor.css";

@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { readPdf } from '../pdf.js';
+import { captureSource } from '../research/sources.js';
 
 // A tiny deterministic PDF fixture; no network or external document is involved.
 function samplePdf() {
@@ -37,6 +38,43 @@ test('PDF tool extracts real text with page numbers and validates ranges', async
     assert.equal(result.pages[0].page, 1);
     assert.match(result.pages[0].text, /Reproducible research sample/);
     await assert.rejects(() => readPdf(root, 'sample.pdf', 2, 3), { code: 'pdfRange' });
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test('research PDF evidence matches an exact page and rejects missing pages and fabricated excerpts', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'research-pdf-source-test-'));
+  try {
+    await writeFile(join(root, 'sample.pdf'), samplePdf());
+    const source = await captureSource(root, {
+      path: 'sample.pdf',
+      page: 1,
+      quote: 'Reproducible research sample',
+      role: 'source',
+    });
+    assert.equal(source.verification, 'excerpt-matched');
+    assert.equal(source.page, 1);
+    assert.match(source.sha256!, /^[a-f0-9]{64}$/);
+    await assert.rejects(
+      () =>
+        captureSource(root, {
+          path: 'sample.pdf',
+          quote: 'Reproducible research sample',
+          role: 'source',
+        }),
+      { code: 'researchPageRequired' },
+    );
+    await assert.rejects(
+      () =>
+        captureSource(root, {
+          path: 'sample.pdf',
+          page: 1,
+          quote: 'Not in the actual PDF.',
+          role: 'source',
+        }),
+      { code: 'researchExcerptMismatch' },
+    );
   } finally {
     await rm(root, { recursive: true, force: true });
   }

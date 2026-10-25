@@ -13,6 +13,7 @@ import type {
   Provider,
 } from '../shared/contracts.js';
 import { DomainError } from './errors.js';
+import type { ExecutionEvent, ResearchEntry } from '../shared/research.js';
 
 // Business records only. Pi JSONL remains the sole source of conversation history.
 const records = sqliteTable('records', {
@@ -27,6 +28,7 @@ interface Collections {
   memories: Memory;
   jobs: Job;
   automations: Automation;
+  research: ResearchEntry;
 }
 export class Store {
   private constructor(
@@ -41,6 +43,12 @@ export class Store {
       'CREATE TABLE IF NOT EXISTS records (id TEXT PRIMARY KEY, kind TEXT NOT NULL, data TEXT NOT NULL)',
     );
     await client.execute('CREATE INDEX IF NOT EXISTS records_kind ON records(kind)');
+    await client.execute(
+      'CREATE TABLE IF NOT EXISTS execution_events (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, data TEXT NOT NULL)',
+    );
+    await client.execute(
+      'CREATE INDEX IF NOT EXISTS execution_project ON execution_events(project_id)',
+    );
     return new Store(client, drizzle(client));
   }
   async list<K extends keyof Collections>(kind: K): Promise<Collections[K][]> {
@@ -67,6 +75,19 @@ export class Store {
   }
   async remove(kind: keyof Collections, id: string) {
     await this.db.delete(records).where(and(eq(records.kind, kind), eq(records.id, id)));
+  }
+  async appendExecution(event: ExecutionEvent) {
+    await this.client.execute({
+      sql: 'INSERT INTO execution_events (id, project_id, data) VALUES (?, ?, ?)',
+      args: [event.id, event.projectId, JSON.stringify(event)],
+    });
+  }
+  async executions(projectId: string): Promise<ExecutionEvent[]> {
+    const result = await this.client.execute({
+      sql: 'SELECT data FROM execution_events WHERE project_id = ? ORDER BY rowid DESC',
+      args: [projectId],
+    });
+    return result.rows.map((r) => JSON.parse(String(r.data)));
   }
   close() {
     this.client.close();

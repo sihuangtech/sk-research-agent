@@ -6,6 +6,7 @@ import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Sidebar() {
   const { t } = useTranslation();
+  const { t: settingsText } = useTranslation('settings');
 
   const {
     data,
@@ -87,7 +88,7 @@ export default function Sidebar() {
       <div className="sidebar-footer">
         <LanguageSwitcher />
         <button onClick={() => setSettings(true)}>
-          <Settings2 size={16} /> {t('settings')}
+          <Settings2 size={16} /> {settingsText('title')}
         </button>
         <div className="local-status">
           <i className={online ? 'online' : ''} />

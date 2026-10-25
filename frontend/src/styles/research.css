@@ -1,0 +1,129 @@
+.research-heading,
+.research-entry-meta,
+.research-view-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.research-heading h2 {
+  margin: 0;
+}
+.research-heading > span {
+  font-size: 10px;
+  color: var(--muted);
+}
+.research-view-tabs {
+  background: #15171a;
+  border: 1px solid var(--line);
+  padding: 3px;
+  border-radius: 7px;
+}
+.research-view-tabs button {
+  flex: 1;
+  padding: 8px;
+  font-size: 11px;
+}
+.research-view-tabs button.active {
+  background: #30382d;
+  color: var(--accent);
+}
+.research-panel form.research-search {
+  display: flex;
+  gap: 6px;
+  margin: 16px 0;
+}
+.research-search input {
+  min-width: 0;
+  width: 100%;
+}
+.research-search button {
+  flex-shrink: 0;
+  font-size: 11px;
+}
+.research-entry {
+  border-left: 2px solid #6c7d59;
+  background: #1d2023;
+}
+.research-entry-meta {
+  color: var(--accent);
+  font-size: 10px;
+}
+.research-entry-meta > span:last-child {
+  color: var(--muted);
+}
+.research-entry h3 {
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 9px 0 5px;
+  overflow-wrap: anywhere;
+}
+.research-note-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 280px;
+  overflow: auto;
+}
+.research-unreviewed {
+  color: #c7ad86;
+  font-size: 10px;
+  margin: 6px 0;
+}
+.research-source {
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+  margin: 12px 0;
+}
+.research-source a,
+.research-file-link {
+  display: block;
+  overflow-wrap: anywhere;
+  text-align: left;
+  font-size: 11px;
+  line-height: 1.8;
+}
+.research-file-link {
+  padding: 3px 0;
+  color: var(--accent);
+}
+.research-source blockquote {
+  border-left: 2px solid #505a48;
+  margin: 8px 0;
+  padding-left: 10px;
+  white-space: pre-wrap;
+}
+.research-source code {
+  font-size: 9px;
+  overflow-wrap: anywhere;
+}
+.research-source-state {
+  display: block;
+  font-size: 10px;
+  margin: 5px 0;
+  font-weight: 400;
+  color: var(--muted);
+}
+.research-source-state.changed,
+.research-source-state.unavailable {
+  color: #e6b08b;
+}
+.research-source-state.unchanged {
+  color: var(--accent);
+}
+.research-form {
+  padding: 14px;
+  border: 1px solid #4a5542;
+  border-radius: 7px;
+  background: #1d211c;
+}
+.research-source-fields {
+  display: grid;
+  gap: 10px;
+  padding-top: 12px;
+}
+.research-empty {
+  color: var(--muted);
+  font-size: 12px;
+  padding: 24px 0;
+  border-top: 1px solid var(--line);
+}

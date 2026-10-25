@@ -1,0 +1,128 @@
+.settings-back {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  color: var(--muted);
+  padding: 6px 0;
+  margin-bottom: 24px;
+  font-size: 11px;
+}
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  border-top: 1px solid var(--line);
+  padding: 22px 0;
+}
+.settings-row h3 {
+  font-size: 13px;
+  margin: 0 0 7px;
+}
+.settings-row p {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 0;
+}
+.settings-row > select {
+  max-width: 200px;
+}
+.settings-policy {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 20px 0;
+  border-top: 1px solid var(--line);
+}
+.settings-policy > svg {
+  color: #a6b68e;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.settings-policy p {
+  margin: 0;
+  color: #b5bbc3;
+  font-size: 12px;
+}
+.settings-content:focus {
+  outline: none;
+}
+.auth-method-group {
+  margin: 24px 0;
+}
+.auth-method-group h3 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+  color: #b8c8a6;
+}
+.auth-choice-list {
+  display: grid;
+  gap: 8px;
+}
+.auth-choice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid #3c4247;
+  background: #25282c;
+  text-align: left;
+}
+.auth-choice span {
+  display: grid;
+  gap: 5px;
+}
+.auth-choice strong {
+  font-size: 12px;
+  font-weight: 500;
+}
+.auth-choice small {
+  font-size: 11px;
+  color: var(--muted);
+}
+.auth-choice:hover {
+  border-color: #81916e;
+  background: #2d332b;
+}
+@media (max-width: 740px) {
+  .settings-dialog {
+    width: calc(100vw - 18px);
+    height: calc(100vh - 24px);
+  }
+  .settings-dialog[open] {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  .settings-nav {
+    padding: 15px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .settings-brand,
+  .settings-nav h2,
+  .settings-nav-foot {
+    display: none;
+  }
+  .settings-nav nav {
+    display: flex;
+    padding-right: 28px;
+  }
+  .settings-nav nav button {
+    font-size: 11px;
+    padding: 8px;
+    gap: 5px;
+  }
+  .settings-content {
+    padding: 24px 18px;
+  }
+  .settings-close {
+    right: 10px;
+    top: 17px;
+  }
+  .provider-grid {
+    grid-template-columns: 1fr;
+  }
+}

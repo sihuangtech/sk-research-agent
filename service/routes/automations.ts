@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
-import { requestLocale } from '../errors.js';
+import { DomainError, requestLocale } from '../errors.js';
+import { presetById } from '../connections/catalog.js';
 
 import { id, type RouteContext } from './context.js';
 export function registerAutomations(context: RouteContext) {
@@ -16,7 +17,8 @@ export function registerAutomations(context: RouteContext) {
       })
       .parse(request.body);
     await store.get('projects', v.projectId);
-    await store.get('providers', v.providerId);
+    if (presetById((await store.get('providers', v.providerId)).presetId)?.interactiveOnly)
+      throw new DomainError('interactivePlanOnly');
     const a = await store.put('automations', {
       ...v,
       id: randomUUID(),
@@ -30,6 +32,11 @@ export function registerAutomations(context: RouteContext) {
   app.patch('/api/automations/:id', async (request) => {
     const a = await store.get('automations', id(request.params));
     const { enabled } = z.object({ enabled: z.boolean() }).parse(request.body);
+    if (
+      enabled &&
+      presetById((await store.get('providers', a.providerId)).presetId)?.interactiveOnly
+    )
+      throw new DomainError('interactivePlanOnly');
     await store.put('automations', {
       ...a,
       enabled,

@@ -1,0 +1,197 @@
+[
+  {
+    "id": "openai-api",
+    "name": "OpenAI",
+    "group": "international",
+    "authMethod": "api_key",
+    "billing": "api",
+    "sdkProvider": "openai",
+    "baseUrl": "https://api.openai.com/v1",
+    "api": "openai-responses",
+    "docsUrl": "https://platform.openai.com/docs",
+    "usageUrl": "https://platform.openai.com/usage"
+  },
+  {
+    "id": "anthropic-api",
+    "name": "Anthropic",
+    "group": "international",
+    "authMethod": "api_key",
+    "billing": "api",
+    "sdkProvider": "anthropic",
+    "baseUrl": "https://api.anthropic.com",
+    "api": "anthropic-messages",
+    "docsUrl": "https://platform.claude.com/docs"
+  },
+  {
+    "id": "gemini-api",
+    "name": "Google Gemini",
+    "group": "international",
+    "authMethod": "api_key",
+    "billing": "api",
+    "sdkProvider": "google",
+    "baseUrl": "https://generativelanguage.googleapis.com/v1beta",
+    "api": "google-generative-ai",
+    "docsUrl": "https://ai.google.dev/gemini-api/docs"
+  },
+  {
+    "id": "deepseek-api",
+    "name": "DeepSeek",
+    "group": "china",
+    "authMethod": "api_key",
+    "billing": "api",
+    "sdkProvider": "deepseek",
+    "baseUrl": "https://api.deepseek.com/v1",
+    "api": "openai-completions",
+    "docsUrl": "https://api-docs.deepseek.com"
+  },
+  {
+    "id": "grok-api",
+    "name": "xAI · Grok",
+    "group": "international",
+    "authMethod": "api_key",
+    "billing": "api",
+    "sdkProvider": "xai",
+    "baseUrl": "https://api.x.ai/v1",
+    "api": "openai-responses",
+    "docsUrl": "https://docs.x.ai"
+  },
+  {
+    "id": "openrouter-api",
+    "name": "OpenRouter",
+    "group": "international",
+    "authMethod": "api_key",
+    "billing": "api",
+    "sdkProvider": "openrouter",
+    "baseUrl": "https://openrouter.ai/api/v1",
+    "api": "openai-completions",
+    "docsUrl": "https://openrouter.ai/docs"
+  },
+  {
+    "id": "mistral-api",
+    "name": "Mistral",
+    "group": "international",
+    "authMethod": "api_key",
+    "billing": "api",
+    "sdkProvider": "mistral",
+    "baseUrl": "https://api.mistral.ai",
+    "api": "mistral-conversations",
+    "docsUrl": "https://docs.mistral.ai"
+  },
+  {
+    "id": "groq-api",
+    "name": "Groq",
+    "group": "international",
+    "authMethod": "api_key",
+    "billing": "api",
+    "sdkProvider": "groq",
+    "baseUrl": "https://api.groq.com/openai/v1",
+    "api": "openai-completions",
+    "docsUrl": "https://console.groq.com/docs"
+  },
+  {
+    "id": "moonshot-api",
+    "name": "Moonshot AI",
+    "group": "international",
+    "authMethod": "api_key",
+    "billing": "api",
+    "sdkProvider": "moonshotai",
+    "baseUrl": "https://api.moonshot.ai/v1",
+    "api": "openai-completions",
+    "docsUrl": "https://platform.moonshot.ai/docs"
+  },
+  {
+    "id": "moonshot-api-cn",
+    "name": "月之暗面",
+    "group": "china",
+    "authMethod": "api_key",
+    "billing": "api",
+    "sdkProvider": "moonshotai-cn",
+    "baseUrl": "https://api.moonshot.cn/v1",
+    "api": "openai-completions",
+    "docsUrl": "https://platform.moonshot.cn/docs"
+  },
+  {
+    "id": "qwen-api-cn",
+    "name": "阿里云百炼 · API",
+    "group": "china",
+    "authMethod": "api_key",
+    "billing": "api",
+    "baseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    "api": "openai-completions",
+    "docsUrl": "https://help.aliyun.com/zh/model-studio/",
+    "models": ["qwen3.7-plus", "qwen3.8-max", "qwen3.8-flash"]
+  },
+  {
+    "id": "glm-api-cn",
+    "name": "智谱 · API",
+    "group": "china",
+    "authMethod": "api_key",
+    "billing": "api",
+    "baseUrl": "https://open.bigmodel.cn/api/paas/v4",
+    "api": "openai-completions",
+    "docsUrl": "https://docs.bigmodel.cn",
+    "models": ["glm-5.3", "glm-5.2", "glm-4.7"]
+  },
+  {
+    "id": "minimax-api",
+    "name": "MiniMax · API",
+    "group": "international",
+    "authMethod": "api_key",
+    "billing": "api",
+    "sdkProvider": "minimax",
+    "baseUrl": "https://api.minimax.io/anthropic",
+    "api": "anthropic-messages",
+    "docsUrl": "https://platform.minimax.io/docs"
+  },
+  {
+    "id": "siliconflow-api",
+    "name": "SiliconFlow",
+    "group": "china",
+    "authMethod": "api_key",
+    "billing": "api",
+    "baseUrl": "https://api.siliconflow.cn/v1",
+    "api": "openai-completions",
+    "docsUrl": "https://docs.siliconflow.cn"
+  },
+  {
+    "id": "volcengine-api",
+    "name": "火山方舟",
+    "group": "china",
+    "authMethod": "api_key",
+    "billing": "api",
+    "baseUrl": "https://ark.cn-beijing.volces.com/api/v3",
+    "api": "openai-completions",
+    "docsUrl": "https://www.volcengine.com/docs/82379"
+  },
+  {
+    "id": "mimo-api",
+    "name": "Xiaomi MiMo",
+    "group": "china",
+    "authMethod": "api_key",
+    "billing": "api",
+    "sdkProvider": "xiaomi",
+    "baseUrl": "https://api.xiaomimimo.com/v1",
+    "api": "openai-completions",
+    "docsUrl": "https://platform.xiaomimimo.com"
+  },
+  {
+    "id": "ollama",
+    "name": "Ollama",
+    "group": "local",
+    "authMethod": "none",
+    "billing": "local",
+    "baseUrl": "http://127.0.0.1:11434/v1",
+    "api": "openai-completions",
+    "docsUrl": "https://docs.ollama.com/api/openai-compatibility"
+  },
+  {
+    "id": "lmstudio",
+    "name": "LM Studio",
+    "group": "local",
+    "authMethod": "none",
+    "billing": "local",
+    "baseUrl": "http://127.0.0.1:1234/v1",
+    "api": "openai-completions",
+    "docsUrl": "https://lmstudio.ai/docs/developer/openai-compat"
+  }
+]

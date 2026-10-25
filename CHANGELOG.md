@@ -6,6 +6,23 @@ Chinese changelog: [CHANGELOG.zh.md](CHANGELOG.zh.md)
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/).
 
+## 0.4.0 (20261025) - 2026-10-25
+
+- Replace the API-only dialog with a dark settings center covering general preferences, accounts/models and privacy/execution, with searchable providers and all 10 languages.
+- Group account sign-in and API-key options under each provider, remove mixed authentication/billing tabs, and retain Pi-backed authentication and isolated credentials without adding dependencies. Reset scroll and focus when navigating settings; test grouping, aliases and SDK auth availability.
+- Add official ChatGPT subscription authorization and SDK-backed GitHub Copilot/Kimi Code sign-in, isolated credentials, cancellation/timeouts, serialized refresh and sign-out. ChatGPT validates signed identity tokens, issuer/audience, state/nonce and plan scope, reuses host/client registrations and calls the public Responses endpoint.
+- Add 31 connection presets separating subscriptions, Coding Plans, metered APIs and local servers; preserve native SDK model capabilities and prevent plan endpoint overrides or implicit billing fallback.
+- Restrict subscription/plan connections to interactive work, disable automatic retries for those connections, and stop associated turns/schedules on sign-out while distinguishing confirmed remote revocation from local removal.
+- Install openid-client and open with official npm commands; add OAuth, credential isolation, plan routing and inference request-contract tests.
+
+- Align the available Tauri Rust/JavaScript dependency series to restore desktop packaging, and deduplicate React resolution during workspace development.
+- Pin transitive DOMPurify and undici dependencies to the published 3.4.17 and 8.12.2 through npm overrides, resolving critical and high-severity advisories found by the official dependency audit.
+- Add a Research panel for questions, hypotheses, evidence, experiments, decisions, next steps and session handoffs, with linked entries, preserved revisions and full JSON export.
+- Add project-isolated cross-session keyword retrieval and budgeted research context; expose research tools and persist explicitly unreviewed turn handoffs.
+- Add SHA-256 source/artifact fingerprints, page-specific PDF and text excerpt matching, and source-drift checks. Agents cannot supersede user entries.
+- Store app-observed tool and background-command events separately, including actual exit codes, runtime platform and file snapshots. Recover interrupted event state without replaying work.
+- Translate the new interface and tools into all 10 supported languages and cover sources, isolation, revisions, history recovery and actual execution in tests, retaining the 300-line source limit.
+
 ## 0.4.0 - 2026-10-24
 
 - Introduce Second Moon branding, a moon-and-research-orbit icon, and rewritten user guides; rename the GitHub repository to sk-research-agent.

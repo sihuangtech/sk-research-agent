@@ -4,6 +4,7 @@ import { type FormEvent, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import type { Conversation, Overview, Project, SessionSnapshot } from '../../../shared/contracts';
 import { request, watchChanges } from '../api';
+import { preferredConnection } from '../preferences';
 
 const empty: Overview = {
   projects: [],
@@ -24,7 +25,11 @@ export function useWorkbenchController() {
   const [providerId, setProviderId] = useState('');
   const [text, setText] = useState('');
   const [mode, setMode] = useState<'steer' | 'followUp'>('steer');
-  const [panel, setPanel] = useState<'files' | 'jobs' | 'memory' | 'automations'>('files');
+  const [panel, setPanel] = useState<'files' | 'research' | 'jobs' | 'memory' | 'automations'>(
+    'files',
+  );
+  const [requestedFile, setRequestedFile] = useState('');
+  useEffect(() => setRequestedFile(''), [projectId]);
   const [settings, setSettings] = useState(false);
   const [addingProject, setAddingProject] = useState(false);
   const [error, setError] = useState<unknown>('');
@@ -76,8 +81,21 @@ export function useWorkbenchController() {
   }, [refresh]);
   useEffect(() => {
     if (!projectId && data.projects.length) setProjectId(data.projects[0].id);
-    if (!providerId && data.providers.length) setProviderId(data.providers[0].id);
+    if (!data.providers.some((p) => p.id === providerId))
+      setProviderId(
+        data.providers.find((p) => p.id === preferredConnection())?.id ||
+          data.providers[0]?.id ||
+          '',
+      );
   }, [data, projectId, providerId]);
+  useEffect(() => {
+    const update = () => {
+      const preferred = preferredConnection();
+      if (preferred) setProviderId(preferred);
+    };
+    window.addEventListener('second-moon-preferences', update);
+    return () => window.removeEventListener('second-moon-preferences', update);
+  }, []);
   useEffect(() => {
     setSnapshot(null);
     if (sessionId) void refresh();
@@ -164,6 +182,8 @@ export function useWorkbenchController() {
     setMode,
     panel,
     setPanel,
+    requestedFile,
+    setRequestedFile,
     settings,
     setSettings,
     addingProject,

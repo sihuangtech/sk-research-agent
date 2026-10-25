@@ -32,6 +32,23 @@ export class Jobs {
       log: '',
     };
     await this.store.put('jobs', job);
+    await this.store.appendExecution({
+      id: randomUUID(),
+      projectId: project.id,
+      sessionId,
+      jobId: job.id,
+      callId: job.id,
+      tool: 'research_job',
+      phase: 'started',
+      createdAt: job.createdAt,
+      arguments: { command },
+      environment: {
+        platform: process.platform,
+        arch: process.arch,
+        node: process.version,
+        cwd: project.path,
+      },
+    });
     const env = { ...process.env };
     delete env.AGENTIC_TOKEN;
     const child = spawn(command, {
@@ -65,6 +82,25 @@ export class Jobs {
         job.exitCode = code;
         if (job.status === 'running') job.status = code === 0 ? 'completed' : 'failed';
         save();
+        persist = persist.then(() =>
+          this.store.appendExecution({
+            id: randomUUID(),
+            projectId: project.id,
+            sessionId,
+            jobId: job.id,
+            callId: job.id,
+            tool: 'research_job',
+            phase:
+              job.status === 'completed'
+                ? 'completed'
+                : job.status === 'cancelled'
+                  ? 'interrupted'
+                  : 'failed',
+            createdAt: job.endedAt!,
+            exitCode: code,
+            durationMs: job.endedAt! - job.createdAt,
+          }),
+        );
         void persist.finally(() => {
           this.children.delete(job.id);
           resolve();

@@ -12,6 +12,8 @@ import { DomainError } from './errors.js';
 import type { Jobs } from './jobs.js';
 import { type SecretStore } from './providers.js';
 import type { Store } from './store.js';
+import { ExecutionAudit } from './research/audit.js';
+import { saveHandoff } from './research/handoff.js';
 
 export { presentMessages } from './agent/messages.js';
 
@@ -23,6 +25,7 @@ interface LiveSession {
   done?: Promise<void>;
   ready: Promise<void>;
   aborting: boolean;
+  audit?: ExecutionAudit;
 }
 export class ResearchAgent {
   private live = new Map<string, LiveSession>();
@@ -135,13 +138,18 @@ export class ResearchAgent {
         record,
         id,
         locale,
+        text,
+        this.changed,
       );
       state.session = session;
+      const project = await this.store.get('projects', record.projectId);
+      state.audit = new ExecutionAudit(this.store, record.projectId, id, project.path);
       await this.store.put('sessions', {
         ...(await this.store.get('sessions', id)),
         sessionFile: session.sessionFile!,
       });
       session.subscribe((event) => {
+        state.audit?.observe(event);
         if (event.type === 'message_update') state.partial = event.message;
         if (event.type === 'message_end') {
           state.partial = undefined;
@@ -179,6 +187,12 @@ export class ResearchAgent {
     } catch (e) {
       error = e instanceof Error ? e.message : String(e);
     } finally {
+      try {
+        await state.audit?.finish();
+        await saveHandoff(this.store, id, text, session.messages, state.aborting || Boolean(error));
+      } catch (recordError) {
+        error = String(recordError);
+      }
       session.dispose();
       await this.store.put('sessions', {
         ...(await this.store.get('sessions', id)),

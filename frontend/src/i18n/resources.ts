@@ -9,6 +9,7 @@ import pt from './locales/pt-BR.json';
 import ru from './locales/ru.json';
 import zh from './locales/zh-CN.json';
 import tw from './locales/zh-TW.json';
+import { settingsCatalogs } from './settings';
 
 export const uiCatalogs = {
   'zh-CN': zh,
@@ -25,6 +26,10 @@ export const uiCatalogs = {
 export const resources = Object.fromEntries(
   Object.entries(uiCatalogs).map(([locale, translation]) => [
     locale,
-    { translation, service: serviceCatalogs[locale as keyof typeof serviceCatalogs] },
+    {
+      translation,
+      service: serviceCatalogs[locale as keyof typeof serviceCatalogs],
+      settings: settingsCatalogs[locale as keyof typeof settingsCatalogs],
+    },
   ]),
 );

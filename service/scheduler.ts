@@ -1,5 +1,6 @@
 import type { ResearchAgent } from './agent.js';
 import type { Store } from './store.js';
+import { presetById } from './connections/catalog.js';
 export function createScheduler(store: Store, agent: ResearchAgent, enabled = true) {
   let ticking = false;
   let stopping = false;
@@ -10,6 +11,10 @@ export function createScheduler(store: Store, agent: ResearchAgent, enabled = tr
       for (const a of await store.list('automations')) {
         if (stopping) break;
         if (!a.enabled || a.nextRunAt > Date.now()) continue;
+        if (presetById((await store.get('providers', a.providerId)).presetId)?.interactiveOnly) {
+          await store.put('automations', { ...a, enabled: false });
+          continue;
+        }
         if (a.lastSessionId && (await store.get('sessions', a.lastSessionId)).status === 'running')
           continue;
         const session = await agent.create(a.projectId, a.providerId, a.name);

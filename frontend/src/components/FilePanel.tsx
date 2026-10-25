@@ -11,10 +11,12 @@ export default function FilePanel({
   project,
   revision,
   onError,
+  initialPath = '',
 }: {
   project?: Project;
   revision: number;
   onError: (error: unknown) => void;
+  initialPath?: string;
 }) {
   const { t } = useTranslation();
 
@@ -84,6 +86,10 @@ export default function FilePanel({
       onError(e);
     }
   }
+  useEffect(() => {
+    if (initialPath && project)
+      void openFile({ path: initialPath, name: initialPath, directory: false, size: 0 });
+  }, [initialPath, project?.id]);
   return (
     <section className="file-panel">
       <div className="panel-heading">

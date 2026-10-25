@@ -1,34 +1,41 @@
 import { randomUUID } from 'node:crypto';
-import { z } from 'zod';
+import open from 'open';
 import { DomainError } from '../errors.js';
 import { createModelRuntime } from '../providers.js';
+import { providerInput } from '../connections/input.js';
+import { presets, presetById, presetModels } from '../connections/catalog.js';
+import { credentialLock } from '../connections/credentials.js';
+import { registerProviderAuth } from './provider-auth.js';
+import { z } from 'zod';
 
 import { id, type RouteContext } from './context.js';
 
-const providerInput = z
-  .object({
-    name: z.string().trim().min(1).max(80),
-    baseUrl: z
-      .url()
-      .refine(
-        (value) =>
-          ['http:', 'https:'].includes(new URL(value).protocol) &&
-          !new URL(value).username &&
-          !new URL(value).password,
-        'invalidApiUrl',
-      ),
-    api: z.enum(['openai-completions', 'openai-responses', 'anthropic-messages']),
-    model: z.string().trim().min(1).max(200),
-    contextWindow: z.number().int().min(2048).max(10_000_000),
-    maxTokens: z.number().int().min(128).max(200_000),
-    apiKey: z.string().max(20000).optional(),
-    clearKey: z.boolean().optional(),
-  })
-  .refine((p) => p.maxTokens < p.contextWindow, 'maxOutput');
 export function registerProviders(context: RouteContext) {
   const { app, store, secrets, changed } = context;
+  const logins = registerProviderAuth(context);
+  app.get('/api/provider-presets', async () => presets);
+  app.post('/api/provider-presets/:preset/open', async (request) => {
+    const { preset: presetId } = z.object({ preset: z.string() }).parse(request.params);
+    const { link } = z.object({ link: z.enum(['documentation', 'usage']) }).parse(request.body);
+    const preset = presetById(presetId);
+    const url = link === 'usage' ? preset?.usageUrl : preset?.docsUrl;
+    if (!url || new URL(url).protocol !== 'https:') throw new DomainError('notFound', 404);
+    // Only fixed catalog links are accepted, never renderer-supplied URLs or file paths.
+    try {
+      await open(url);
+    } catch {
+      throw new DomainError('authFailed');
+    }
+    return { ok: true };
+  });
+  app.get('/api/provider-presets/:preset/models', async (request) => {
+    const { preset: presetId } = z.object({ preset: z.string() }).parse(request.params);
+    const preset = presetById(presetId);
+    if (!preset) throw new DomainError('notFound', 404);
+    return presetModels(preset);
+  });
   app.post('/api/providers', async (request) => {
-    const { apiKey, clearKey: _, ...input } = providerInput.parse(request.body);
+    const { apiKey, input } = await providerInput(request.body);
     const providerId = randomUUID();
     if (apiKey) await secrets.set(providerId, apiKey);
     const provider = await store.put('providers', {
@@ -41,13 +48,17 @@ export function registerProviders(context: RouteContext) {
   });
   app.put('/api/providers/:id', async (request) => {
     const old = await store.get('providers', id(request.params));
-    const { apiKey, clearKey, ...input } = providerInput.parse(request.body);
-    if (apiKey) await secrets.set(old.id, apiKey);
-    else if (clearKey) await secrets.remove(old.id);
+    const { apiKey, clearKey, input } = await providerInput(request.body, old);
+    if (apiKey || clearKey)
+      await credentialLock(secrets, old.id, async () => {
+        if (apiKey) await secrets.set(old.id, apiKey);
+        else await secrets.remove(old.id);
+      });
     const provider = await store.put('providers', {
       ...input,
       id: old.id,
       hasKey: apiKey ? true : clearKey ? false : old.hasKey,
+      accountLabel: old.accountLabel,
     });
     changed();
     return provider;
@@ -59,7 +70,12 @@ export function registerProviders(context: RouteContext) {
       (await store.list('automations')).some((a) => a.providerId === providerId)
     )
       throw new DomainError('providerInUse');
-    await secrets.remove(providerId);
+    const provider = await store.get('providers', providerId);
+    if (provider.authMethod === 'oauth' && provider.hasKey) throw new DomainError('signOutFirst');
+    await logins.cancelProvider(providerId);
+    await credentialLock(secrets, providerId, () => secrets.remove(providerId));
+    if (await secrets.get(`registration:${providerId}`))
+      await secrets.remove(`registration:${providerId}`);
     await store.remove('providers', providerId);
     changed();
     return { ok: true };
@@ -73,7 +89,12 @@ export function registerProviders(context: RouteContext) {
       { messages: [{ role: 'user', content: 'Reply with OK.', timestamp: Date.now() }] },
       { maxTokens: 32, signal: AbortSignal.timeout(30000) },
     );
-    if (response.errorMessage) throw new Error(response.errorMessage);
+    if (
+      response.stopReason === 'error' ||
+      response.stopReason === 'aborted' ||
+      response.errorMessage
+    )
+      throw new DomainError('connectionTestFailed');
     return { ok: true, latencyMs: Date.now() - start };
   });
 }
