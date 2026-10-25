@@ -1,7 +1,8 @@
 import { type RouteContext } from './context.js';
+import packageInfo from '../../package.json' with { type: 'json' };
 export function registerOverview(context: RouteContext) {
   const { app, store } = context;
-  app.get('/api/health', async () => ({ ok: true, runtime: 'pi', version: '0.4.0' }));
+  app.get('/api/health', async () => ({ ok: true, runtime: 'pi', version: packageInfo.version }));
   app.get('/api/overview', async () => ({
     projects: await store.list('projects'),
     providers: await store.list('providers'),

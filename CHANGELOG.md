@@ -1,105 +1,187 @@
 # Changelog
 
-All notable changes to Second Moon are documented here. Early history was reconstructed from repository commits.
-
 Chinese changelog: [CHANGELOG.zh.md](CHANGELOG.zh.md)
 
-The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/).
+This log follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.4.0 (20261025) - 2026-10-25
+## Versioning and historical reconstruction
 
-- Replace the API-only dialog with a dark settings center covering general preferences, accounts/models and privacy/execution, with searchable providers and all 10 languages.
-- Group account sign-in and API-key options under each provider, remove mixed authentication/billing tabs, and retain Pi-backed authentication and isolated credentials without adding dependencies. Reset scroll and focus when navigating settings; test grouping, aliases and SDK auth availability.
-- Add official ChatGPT subscription authorization and SDK-backed GitHub Copilot/Kimi Code sign-in, isolated credentials, cancellation/timeouts, serialized refresh and sign-out. ChatGPT validates signed identity tokens, issuer/audience, state/nonce and plan scope, reuses host/client registrations and calls the public Responses endpoint.
-- Add 31 connection presets separating subscriptions, Coding Plans, metered APIs and local servers; preserve native SDK model capabilities and prevent plan endpoint overrides or implicit billing fallback.
-- Restrict subscription/plan connections to interactive work, disable automatic retries for those connections, and stop associated turns/schedules on sign-out while distinguishing confirmed remote revocation from local removal.
-- Install openid-client and open with official npm commands; add OAuth, credential isolation, plan routing and inference request-contract tests.
+- Historical batches are grouped by Git committer calendar date in Asia/Shanghai. All commits on one date form one batch; dates are not appended to version numbers.
+- The historical numbers below were reconstructed before the first GitHub Release. They are documentation labels, not claims that matching packages or tags were published. Existing Git commits are unchanged.
+- The project remains in initial development (`0.y.z`): features and incompatible rewrites increment MINOR and reset PATCH; compatible fixes, documentation, dependency-only and CI maintenance increment PATCH.
+- This pre-1.0 policy is a project convention; SemVer permits an unstable public API during initial development. At `1.0.0`, the public contract will be declared stable: incompatible changes increment MAJOR, compatible features MINOR, and fixes PATCH.
+- Changelog entries record versioned change batches; GitHub Release publication is a separate action requiring approval. Published versions and tags must never be silently reassigned.
 
-- Align the available Tauri Rust/JavaScript dependency series to restore desktop packaging, and deduplicate React resolution during workspace development.
-- Pin transitive DOMPurify and undici dependencies to the published 3.4.17 and 8.12.2 through npm overrides, resolving critical and high-severity advisories found by the official dependency audit.
-- Add a Research panel for questions, hypotheses, evidence, experiments, decisions, next steps and session handoffs, with linked entries, preserved revisions and full JSON export.
-- Add project-isolated cross-session keyword retrieval and budgeted research context; expose research tools and persist explicitly unreviewed turn handoffs.
-- Add SHA-256 source/artifact fingerprints, page-specific PDF and text excerpt matching, and source-drift checks. Agents cannot supersede user entries.
-- Store app-observed tool and background-command events separately, including actual exit codes, runtime platform and file snapshots. Recover interrupted event state without replaying work.
-- Translate the new interface and tools into all 10 supported languages and cover sources, isolation, revisions, history recovery and actual execution in tests, retaining the 300-line source limit.
-
-## 0.4.0 - 2026-10-24
-
-- Introduce Second Moon branding, a moon-and-research-orbit icon, and rewritten user guides; rename the GitHub repository to sk-research-agent.
-- Split frontend, backend, styles and tests by responsibility; enforce a 300-line file limit through lint, tests and CI.
-- Add 10-language switching using official i18next/react-i18next and JSON catalogs, persisted preferences, regional matching, localized dates/API errors/Agent response instructions/tray labels, and matching official Monaco language packs.
-
-- Adopt Tauri, React, TypeScript, Node.js, and the published Pi Coding Agent SDK.
-- Add project conversations, tool execution, steering, follow-ups, abort, and canonical Pi history restoration.
-- Add OS-keychain model settings, SQLite business storage, scoped memories, and recurring research tasks.
-- Add Monaco editing, PDF.js previews, paginated PDF text extraction, Crossref search, and managed command jobs.
-- Add single-instance tray operation and packaged official Node/npm runtime dependencies.
-- Remove the Python/FastAPI/DBOS pipeline, PyInstaller packaging, and legacy server deployment without compatibility shims.
-- Add integration tests using the real Pi SDK against a controlled model endpoint. Live-provider behavior requires configured credentials.
-
-## 0.3.0 - 2026-08-26
+## 0.9.0 - 2026-10-25
 
 ### Added
 
-- Added OpenAI Agents SDK as the shared agent runtime. OpenAI uses native Responses or Chat Completions adapters; Anthropic and Gemini use the SDK's LiteLLM adapter.
-- Added DBOS durable workflows for research-direction runs, approvals, resumptions, and recovery after process restarts.
-- Added an explicit cloud/desktop runtime model and a status API that reports compute and data location without exposing credentials.
-- Added deterministic batch and run identifiers so recovered workflows do not duplicate completed research work.
-- Added runtime tests and shared frontend types for the new execution model.
-- Added a responsive GitHub repository icon linking to the project source.
+- Add a Research panel for questions, hypotheses, evidence, experiments, decisions, next steps and session handoffs, with linked entries, preserved revisions and full JSON export.
+- Add project-isolated cross-session keyword retrieval, budgeted research context and Agent research tools; mark generated handoffs as unreviewed.
+- Add SHA-256 source/artifact fingerprints, page-specific PDF/text excerpt matching and source-drift checks; preserve user revision ownership.
+- Record app-observed tool and background-command events separately, including exit codes, platform and file snapshots. Recover interrupted state without replaying work.
+- Add ChatGPT subscription authorization and Pi-backed GitHub Copilot/Kimi Code sign-in, with isolated keychain credentials, cancellation, timeouts and serialized refresh.
+- Validate ChatGPT signed identity tokens, issuer/audience, state/nonce and subscription scope; reuse host/client registrations and use the public Responses endpoint.
+- Add 31 connection presets for subscriptions, Coding Plans, metered APIs and local servers, with native SDK model capabilities.
 
 ### Changed
 
-- Reworked the product into one shared research core with two delivery modes: a server-executed Web Agent and a local desktop Agent whose work stays on the user's device except for external model and literature API calls.
-- Redesigned the research workspace around pending approvals, the research-stage spine, run health, and a prominent cloud/local location indicator.
-- Made cloud provider and model settings read-only in the browser; desktop settings remain locally editable.
-- Refined model-output recovery while retaining structured JSON validation for third-party provider compatibility.
-- Updated Python, Node.js, React, Vite, Tauri, and Rust dependencies to their latest compatible stable releases.
-- Standardized Python installation and execution on `uv`, and updated deployment, desktop, environment, and architecture documentation.
-- Renamed the Python command to `agentic-research` and synchronized Python, npm, frontend, Cargo, and Tauri versions.
+- Replace the API-only dialog with a dark settings center for preferences, accounts/models and privacy/execution.
+- Group account and API-key options by provider, with alias search and all 10 languages. Coding Plan describes billing, not another authentication method.
+- Keep subscription/plan connections interactive-only as a product policy, disable automatic retries, and stop associated turns/schedules on sign-out. Never fall back silently to another billing method.
+- Install openid-client and open through npm; retain existing Pi authentication interfaces and account isolation.
+- Synchronize package, frontend, service and desktop versions, and test their consistency.
+- Use Second Moon for desktop bundle and installer filenames while keeping the in-app language selection and existing application identifier/data location.
+
+### Fixed
+
+- Restore compatible Tauri Rust/JavaScript dependency series and deduplicate React resolution.
+- Reset scroll position and focus when navigating settings.
 
 ### Security
 
-- Disabled Agents SDK tracing by default and excluded sensitive trace payloads unless tracing is explicitly enabled.
-- Kept API keys out of child experiment processes and public runtime-status responses.
-- Prevented ordinary cloud users from changing server-wide model credentials through the Web UI.
+- Pin DOMPurify and undici overrides to address audited critical/high advisories.
+- Distinguish confirmed remote revocation from local credential removal; never expose raw OAuth tokens/errors to the renderer.
 
-## 0.2.0 - 2026-07-20
+### Verification
+
+- Add research provenance/history, provider grouping/search, OAuth isolation, cancellation, refresh and request-contract tests.
+- Local tests and macOS UI checks are not proof of live subscription eligibility or provider quota use.
+
+## 0.8.0 - 2026-10-24
+
+Incompatible runtime replacement during initial development.
 
 ### Added
 
-- Rebuilt the early prototype as a local-first, auditable workflow covering evidence collection, falsifiable hypotheses, experiment planning, human approval, code or notebook execution, held-out validation, and report generation.
-- Added FastAPI REST and SSE endpoints, a React/Vite workspace, process supervision, run artifacts, live logs, and provider configuration.
-- Added generated-code policy checks, constrained subprocess execution, run locking, provider validation, and tests for the research and execution layers.
-- Added the Tauri 2 desktop application with a bundled Python sidecar, local lifecycle management, generated platform icons, and desktop packaging.
-- Added English and Simplified Chinese localization, persisted language and theme preferences, and localization consistency checks.
-- Added Docker, Nginx, and non-container deployment materials plus research protocol, security, desktop, and Semantic Scholar documentation.
-- Added retry-assisted structured JSON extraction for imperfect model responses.
+- Adopt Tauri, React, TypeScript, Node.js and the published Pi Coding Agent SDK.
+- Add project conversations, tool execution, steering, follow-ups, abort and canonical Pi history restoration.
+- Add OS-keychain settings, SQLite business records, scoped memories and recurring research tasks.
+- Add Monaco editing, PDF.js previews, paginated PDF text extraction, Crossref search and managed command jobs.
+- Add single-instance tray operation and packaged official Node/npm runtime dependencies.
+- Add 10-language localization and enforce a 300-line source-file limit in lint, tests and CI.
 
 ### Changed
 
-- Replaced the original `src/agents` prototype with domain, infrastructure, research, workflow, and API modules.
-- Renamed the product from Papermill to Agentic Research and standardized the package name as `sk-agentic-research`.
-- Migrated the frontend from JavaScript to TypeScript and improved navigation, responsive layout, themes, and settings UX.
-- Updated provider defaults, environment-driven ports, dependency locks, repository metadata, and deployment guidance.
+- Introduce Second Moon branding and the research-orbit icon, rename the GitHub repository, and rewrite user guides.
+- Center the README logo and add star-history charts.
+- Merge the existing Trustabl workflow; its original addition is recorded on 2026-09-30.
 
 ### Removed
 
-- Removed the original monolithic FARS agents and orchestrator after the auditable workflow architecture replaced them.
-- Removed automatic installation of heavyweight system dependencies from the paper-writing path.
+- Remove the Python/FastAPI/DBOS pipeline, PyInstaller packaging and legacy server deployment without compatibility shims.
+- Stop tracking private documentation, competition materials and local legacy assets; retain their local files.
 
-## 0.1.0 - 2026-06-22
+## 0.7.1 - 2026-09-30
 
-This version is reconstructed from the first FARS and research-workflow commits; the original repository did not create a `v0.1.0` tag.
+CI/security maintenance, without a new product feature.
 
-### 2026-06-22
+### Security
 
-- Added a dedicated Simplified Chinese README and refreshed the frontend dependency set.
+- Add the Trustabl GitHub Actions security-scanning workflow; merge into main follows on 2026-10-24.
 
-### 2026-03-02
+## 0.7.0 - 2026-09-15
 
-- Created the initial Fully Automated Research System (FARS) prototype with ideation, planning, experiment, writing, and orchestration agents.
-- Integrated early literature and repository search adapters and a unified OpenAI, Anthropic, and Google model client.
-- Added experiment retries, LaTeX paper generation, plots, and the first automated PDF workflow.
-- Added the first FastAPI and React/Vite Web interface, real-time monitoring, Docker, and Nginx configuration.
-- Reorganized the prototype into `src/` and extracted prompts into configuration files.
+Removal of previous runtime modules during initial development.
+
+### Removed
+
+- Remove previous infrastructure, execution/process helpers, configuration/storage modules, research modules, API routes and workflow initialization.
+- This records the deletion itself, not a claim that the intermediate checkout was a complete working release.
+
+## 0.6.0 - 2026-08-27
+
+New interface features plus startup fixes.
+
+### Added
+
+- Add responsive GitHub repository links to the sidebar/mobile footer and Bilibili/Xiaohongshu footer links.
+
+### Fixed
+
+- Allow desktop startup before model configuration is complete.
+
+### Changed
+
+- Add the earlier reconstructed changelog and adjust Markdown lint rules.
+
+## 0.5.0 - 2026-08-26
+
+Incompatible agent/workflow redesign during initial development.
+
+### Added
+
+- Introduce a shared OpenAI Agents SDK runtime and DBOS durable workflows with approvals, resumption and restart recovery.
+- Add cloud/desktop execution-location reporting, deterministic run identifiers and runtime tests.
+
+### Changed
+
+- Separate server-executed Web and local desktop behavior, redesign the research workbench, and make cloud model settings read-only.
+- Preserve structured-response recovery, update compatible dependencies and standardize Python operations on uv.
+
+### Security
+
+- Disable SDK tracing by default, exclude sensitive payloads unless enabled, and isolate provider secrets from experiment processes and public status.
+
+## 0.4.0 - 2026-07-20
+
+Provider/configuration features.
+
+### Added
+
+- Add environment-driven backend ports, provider configuration and validation improvements, and retry-assisted JSON extraction with tests.
+
+### Changed
+
+- Standardize the package name as sk-agentic-research and update deployment documentation.
+
+## 0.3.0 - 2026-07-19
+
+Desktop and interface features.
+
+### Added
+
+- Add the Tauri desktop shell, packaged Python sidecar, platform icons and English/Simplified Chinese interfaces.
+- Add theme switching, desktop navigation and responsive interface improvements.
+
+### Changed
+
+- Rename Papermill to Agentic Research, migrate frontend source to TypeScript, and update dependencies/repository metadata.
+
+## 0.2.0 - 2026-07-18
+
+Incompatible research-workflow rewrite during initial development.
+
+### Added
+
+- Rebuild research work around evidence, falsifiable hypotheses, plans, approval, execution, held-out validation and reports.
+- Add FastAPI REST/SSE, modular React pages, run artifacts/logs, process supervision, policy checks, locks and automated tests.
+- Add project/deployment configuration and update provider defaults.
+
+### Removed
+
+- Replace the original monolithic agents/orchestrator with domain, infrastructure, research, workflow and API modules.
+- Remove automatic heavyweight dependency installation from paper-writing execution.
+
+## 0.1.1 - 2026-06-22
+
+Documentation/dependency maintenance.
+
+### Changed
+
+- Add a dedicated Simplified Chinese README, refresh frontend dependencies and refine ignore rules.
+
+## 0.1.0 - 2026-03-02
+
+Initial prototype baseline.
+
+### Added
+
+- Create the initial FARS ideation, planning, experiment, writing and orchestration agents.
+- Add literature/repository search adapters and a unified OpenAI/Anthropic/Google model client.
+- Add experiment retries, LaTeX/PDF generation and plots.
+- Add the first FastAPI and React/Vite Web interface, live monitoring, Docker and Nginx configuration.
+
+### Changed
+
+- Reorganize source into src/, extract prompt configuration, and introduce ESLint/Tailwind and improved API data handling.

@@ -1,5 +1,6 @@
 import { FolderOpen, MessageSquare, Plus, Settings2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import packageInfo from '../../../package.json';
 
 import { useWorkbench } from '../state/WorkbenchContext';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -93,7 +94,7 @@ export default function Sidebar() {
         <div className="local-status">
           <i className={online ? 'online' : ''} />
           {online ? t('online') : t('connecting')}
-          <span>0.4</span>
+          <span>{packageInfo.version}</span>
         </div>
       </div>
     </aside>

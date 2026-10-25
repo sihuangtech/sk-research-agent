@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "第二月亮",
-  "version": "0.4.0",
+  "productName": "Second Moon",
+  "version": "0.9.0",
   "identifier": "cn.skstudio.agenticresearch",
   "build": {
     "frontendDist": "../frontend/dist",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "第二月亮",
+        "title": "Second Moon",
         "width": 1440,
         "height": 900,
         "minWidth": 1024,
