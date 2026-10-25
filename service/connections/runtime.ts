@@ -8,7 +8,6 @@ import type { Provider } from '../../shared/contracts.js';
 import { DomainError } from '../errors.js';
 import type { SecretStore } from '../providers.js';
 import { presetById } from './catalog.js';
-import { chatGPTAuth } from './chatgpt.js';
 import { ConnectionCredentials } from './credentials.js';
 import { chatGPTPayload } from './payload.js';
 import type { ModelChoice } from '../../shared/providers.js';
@@ -30,8 +29,7 @@ export async function connectionRuntime(provider: Provider, secrets: SecretStore
       auth:
         provider.authMethod === 'oauth'
           ? {
-              oauth:
-                preset?.id === 'chatgpt' ? chatGPTAuth(secrets, provider.id) : builtin.auth.oauth,
+              oauth: builtin.auth.oauth,
             }
           : {
               apiKey: {

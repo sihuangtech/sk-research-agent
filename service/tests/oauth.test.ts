@@ -1,113 +1,45 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { chatGPTAuth, revokeChatGPT } from '../connections/chatgpt.js';
 import { ConnectionCredentials } from '../connections/credentials.js';
 import { connectionRuntime } from '../connections/runtime.js';
+import { installationDeviceId } from '../connections/installation.js';
 import { chatGPTPayload } from '../connections/payload.js';
 import { connectionModels } from '../connections/models.js';
 import { fixture, TestSecrets } from './helpers.js';
 import { oauthFixture } from './oauth-fixture.js';
 
-test('ChatGPT uses official OIDC validation, stable host and reusable client registration', async () => {
-  const mock = oauthFixture();
+test('installation identity is stable, serialized and accepts existing host IDs', async () => {
   const secrets = new TestSecrets();
-  const urls: URL[] = [];
+  const ids = await Promise.all(Array.from({ length: 5 }, () => installationDeviceId(secrets)));
+  assert.equal(new Set(ids).size, 1);
+  assert.match(ids[0], /^[0-9a-f-]{36}$/);
+  await secrets.set('installation', `urn:uuid:${ids[0]}`);
+  assert.equal(await installationDeviceId(secrets), ids[0]);
+});
+
+test('all account presets expose Pi builtin OAuth methods and metadata', async () => {
+  const f = await fixture();
   try {
-    const auth = chatGPTAuth(secrets, 'account-a');
-    const login = () =>
-      auth.login({
-        signal: AbortSignal.timeout(5000),
-        prompt: async () => {
-          throw new Error('Unexpected prompt');
-        },
-        notify: (event) => {
-          if (event.type === 'auth_url') {
-            urls.push(new URL(event.url));
-            void mock.authorize(event.url);
-          }
-        },
+    for (const presetId of ['chatgpt', 'copilot', 'kimi-login']) {
+      const p = await f.call('/providers', 'POST', { name: presetId, presetId });
+      const { runtime, sdkId } = await connectionRuntime(p, f.secrets);
+      const { ModelRuntime } = await import('@earendil-works/pi-coding-agent');
+      const { InMemoryCredentialStore } = await import('@earendil-works/pi-ai');
+      const builtin = await ModelRuntime.create({
+        credentials: new InMemoryCredentialStore(),
+        modelsPath: null,
+        refreshOnCreate: false,
       });
-    const first = await login();
-    assert.equal(first.subject, 'test-user');
-    assert.equal(first.email, 'fixture@example.test');
-    await secrets.set('account-a', JSON.stringify(first));
-    const second = await login();
-    assert.equal(second.clientId, first.clientId);
-    assert.equal(urls[0].searchParams.get('client_id'), 'dynamic_agent_client');
-    assert.equal(urls[1].searchParams.get('client_id'), 'oaiapp_test');
-    assert.equal(urls[0].searchParams.get('agent_name_hint'), 'Second Moon');
-    assert.equal(urls[1].searchParams.get('agent_name_hint'), null);
-    assert.equal(
-      urls[0].searchParams.get('ext_agent_host_id'),
-      urls[1].searchParams.get('ext_agent_host_id'),
-    );
-    assert.notEqual(urls[0].searchParams.get('state'), urls[1].searchParams.get('state'));
-    assert.equal(urls[1].searchParams.get('id_token_hint'), first.idToken);
-    assert.ok(mock.requests.some((r) => r.url.endsWith('/jwks.json')));
-    assert.equal(await revokeChatGPT(second), true);
-    const tokenRequest = mock.requests.find(
-      (r) => r.body.get('grant_type') === 'authorization_code',
-    )!;
-    assert.equal(tokenRequest.body.get('client_id'), 'oaiapp_test');
-    assert.equal(tokenRequest.body.get('resource'), 'https://api.openai.com/v1');
-    assert.ok(tokenRequest.body.get('code_verifier'));
-  } finally {
-    mock.close();
-  }
-});
-
-test('ChatGPT rejects invalid signatures, nonces, missing plan grants and account substitution', async () => {
-  for (const mode of ['nonce', 'signature', 'scope', 'identity']) {
-    const mock = oauthFixture();
-    const secrets = new TestSecrets();
-    if (mode === 'nonce') mock.setInvalidNonce();
-    if (mode === 'signature') mock.setTamperedSignature();
-    if (mode === 'scope') mock.setDeniedScope();
-    if (mode === 'identity')
-      await secrets.set(
-        'registration:test',
-        JSON.stringify({ clientId: 'oaiapp_test', subject: 'original-user' }),
-      );
-    try {
-      await assert.rejects(
-        chatGPTAuth(secrets, 'test').login({
-          signal: AbortSignal.timeout(5000),
-          prompt: async () => '',
-          notify: (event) => {
-            if (event.type === 'auth_url') void mock.authorize(event.url);
-          },
-        }),
-      );
-      assert.equal(await secrets.get('test'), null);
-    } finally {
-      mock.close();
+      const actual = runtime.getProvider(sdkId)?.auth.oauth;
+      const expected = builtin.getProvider(sdkId)?.auth.oauth;
+      assert.ok(actual && expected);
+      assert.equal(actual.name, expected.name);
+      assert.equal(actual.loginLabel, expected.loginLabel);
+      for (const method of ['login', 'refresh', 'toAuth'] as const)
+        assert.equal(actual[method].toString(), expected[method].toString());
     }
-  }
-});
-
-test('ChatGPT rejects wrong callback state and supports cancellation without leaving a listener', async () => {
-  const mock = oauthFixture();
-  const controller = new AbortController();
-  let callbackUrl: URL | undefined;
-  try {
-    const pending = chatGPTAuth(new TestSecrets(), 'test').login({
-      signal: controller.signal,
-      prompt: async () => '',
-      notify: (event) => {
-        if (event.type === 'auth_url') {
-          callbackUrl = new URL(new URL(event.url).searchParams.get('redirect_uri')!);
-          void mock.authorize(event.url, { state: 'wrong' }).then((result) => {
-            assert.equal(result.status, 400);
-            controller.abort();
-          });
-        }
-      },
-    });
-    await assert.rejects(pending);
-    assert.ok(!mock.requests.some((r) => r.url.endsWith('/token')));
-    await assert.rejects(fetch(callbackUrl!));
   } finally {
-    mock.close();
+    await f.close();
   }
 });
 

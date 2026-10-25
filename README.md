@@ -54,7 +54,7 @@ ChatGPT uses [OpenAI's subscription authorization for local open-source apps](ht
 
 A plan's credential may still be called an API key even when usage is covered by a subscription. It must match the selected endpoint. As a conservative product policy, subscription and Coding Plan connections are interactive-only; choose an API or local model for scheduled work. Connection tests consume some quota. Catalogs and capabilities come from the installed SDK/configuration, not live verification of every paid provider account.
 
-**General** contains language and the default connection for new conversations. **Privacy & execution** explains data sharing and local permissions. ChatGPT sign-out attempts remote revocation, clears local tokens even if revocation fails, and reports that distinction. Other providers' sign-out removes this app's local credentials only.
+**General** contains language and the default connection for new conversations. **Privacy & execution** explains data sharing and local permissions. All account sign-in and token refresh flows use Pi's built-in providers. Sign-out removes this app's local credentials only; revoke remote access in the provider's account settings.
 
 ## Languages
 
@@ -66,7 +66,7 @@ The editor's internal menu language is selected when it first loads. Restart the
 
 ## Data and background work
 
-Source materials and generated outputs stay in your chosen project folder. Conversations, memories, job records and model configurations are stored in the local application data directory. API keys, OAuth access/refresh tokens and account registrations are kept separately in the operating system's credential store, without plaintext storage in project files or the configuration database. Settings expose account labels, never tokens.
+Source materials and generated outputs stay in your chosen project folder. Conversations, memories, job records and model configurations are stored in the local application data directory. API keys, OAuth access/refresh tokens and installation identity are kept separately in the operating system's credential store, without plaintext storage in project files or the configuration database. Settings expose account labels, never tokens.
 
 Online model requests send the relevant prompts, file contents, memories and tool results to your configured provider, which handles model billing. Literature search requires an internet connection. Local models can support offline tasks that do not need external information. There is currently no cloud account service, device synchronization or team collaboration backend.
 

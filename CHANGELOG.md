@@ -20,8 +20,7 @@ This log follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [S
 - Add project-isolated cross-session keyword retrieval, budgeted research context and Agent research tools; mark generated handoffs as unreviewed.
 - Add SHA-256 source/artifact fingerprints, page-specific PDF/text excerpt matching and source-drift checks; preserve user revision ownership.
 - Record app-observed tool and background-command events separately, including exit codes, platform and file snapshots. Recover interrupted state without replaying work.
-- Add ChatGPT subscription authorization and Pi-backed GitHub Copilot/Kimi Code sign-in, with isolated keychain credentials, cancellation, timeouts and serialized refresh.
-- Validate ChatGPT signed identity tokens, issuer/audience, state/nonce and subscription scope; reuse host/client registrations and use the public Responses endpoint.
+- Add ChatGPT, GitHub Copilot and Kimi Code account sign-in using Pi's built-in OAuth login and refresh, with isolated keychain credentials, cancellation, timeouts and serialized refresh.
 - Add 31 connection presets for subscriptions, Coding Plans, metered APIs and local servers, with native SDK model capabilities.
 
 ### Changed
@@ -29,7 +28,7 @@ This log follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [S
 - Replace the API-only dialog with a dark settings center for preferences, accounts/models and privacy/execution.
 - Group account and API-key options by provider, with alias search and all 10 languages. Coding Plan describes billing, not another authentication method.
 - Keep subscription/plan connections interactive-only as a product policy, disable automatic retries, and stop associated turns/schedules on sign-out. Never fall back silently to another billing method.
-- Install openid-client and open through npm; retain existing Pi authentication interfaces and account isolation.
+- Remove custom ChatGPT authentication and callback handling, supply Pi with a stable installation ID, and uninstall openid-client through the official npm command.
 - Synchronize package, frontend, service and desktop versions, and test their consistency.
 - Use Second Moon for desktop bundle and installer filenames while keeping the in-app language selection and existing application identifier/data location.
 
@@ -41,11 +40,12 @@ This log follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [S
 ### Security
 
 - Pin DOMPurify and undici overrides to address audited critical/high advisories.
-- Distinguish confirmed remote revocation from local credential removal; never expose raw OAuth tokens/errors to the renderer.
+- Sign-out clears local credentials only; never expose raw OAuth tokens/errors to the renderer.
 
 ### Verification
 
 - Add research provenance/history, provider grouping/search, OAuth isolation, cancellation, refresh and request-contract tests.
+- Verify Pi's ChatGPT callback exchange and credential persistence with simulated authorization responses, plus local-only sign-out and stable installation identity.
 - Local tests and macOS UI checks are not proof of live subscription eligibility or provider quota use.
 
 ## 0.8.0 - 2026-10-24

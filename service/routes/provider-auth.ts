@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { Logins } from '../connections/login.js';
 import { connectionRuntime } from '../connections/runtime.js';
-import { revokeChatGPT } from '../connections/chatgpt.js';
 import { connectionModels } from '../connections/models.js';
 import { DomainError } from '../errors.js';
 import { id, type RouteContext } from './context.js';
@@ -39,15 +38,10 @@ export function registerProviderAuth(context: RouteContext) {
       if (automation.providerId === provider.id)
         await store.put('automations', { ...automation, enabled: false });
     const { credentials, sdkId } = await connectionRuntime(provider, secrets);
-    const value = await credentials.read(sdkId);
-    const revoked =
-      provider.presetId === 'chatgpt' && value?.type === 'oauth'
-        ? await revokeChatGPT(value)
-        : false;
     await credentials.delete(sdkId);
-    await store.put('providers', { ...provider, hasKey: false });
+    await store.put('providers', { ...provider, hasKey: false, accountLabel: undefined });
     changed();
-    return { ok: true, revoked };
+    return { ok: true, revoked: false };
   });
   app.get('/api/providers/:id/models', async (request) => {
     try {

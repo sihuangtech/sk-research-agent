@@ -82,7 +82,7 @@ test('plan endpoints are immutable, credentials are isolated and automated plan 
   }
 });
 
-test('OAuth connections reject pasted API keys and sign-out revokes only the selected account', async () => {
+test('OAuth connections reject pasted API keys and sign-out clears only the selected account', async () => {
   const f = await fixture();
   const mock = oauthFixture();
   try {
@@ -122,16 +122,14 @@ test('OAuth connections reject pasted API keys and sign-out revokes only the sel
       await f.server.store.put('providers', { ...p, hasKey: true });
     }
     const result = await f.call(`/providers/${a.id}/logout`, 'POST');
-    assert.equal(result.revoked, true);
+    assert.equal(result.revoked, false);
     assert.equal(await f.secrets.get(a.id), null);
     assert.ok(await f.secrets.get(b.id));
     assert.ok(await f.secrets.get(`registration:${a.id}`));
     const overview = await f.call('/overview');
     assert.equal(overview.providers.find((p: { id: string }) => p.id === a.id).hasKey, false);
     assert.ok(!JSON.stringify(overview).includes('refresh-'));
-    const request = mock.requests.find((r) => r.url.endsWith('/revoke'))!;
-    assert.equal(request.body.get('token'), `refresh-${a.id}`);
-    assert.equal(request.body.get('token_type_hint'), 'refresh_token');
+    assert.ok(!mock.requests.some((r) => r.url.endsWith('/revoke')));
   } finally {
     mock.close();
     await f.close();

@@ -7,6 +7,7 @@ import { DomainError } from '../errors.js';
 import type { SecretStore } from '../providers.js';
 import type { Store } from '../store.js';
 import { connectionRuntime } from './runtime.js';
+import { installationDeviceId } from './installation.js';
 import { credentialLock } from './credentials.js';
 
 interface Attempt {
@@ -104,6 +105,7 @@ export class Logins {
     try {
       previous = await this.secrets.get(provider.id);
       const { runtime, sdkId } = await connectionRuntime(provider, this.secrets);
+      const deviceId = await installationDeviceId(this.secrets);
       const credential = await runtime.login(
         sdkId,
         'oauth',
@@ -112,7 +114,7 @@ export class Logins {
           notify: (event) => this.notify(attempt, event),
           prompt: (prompt) => this.prompt(attempt, prompt),
         },
-        { agentName: 'Second Moon' },
+        { agentName: 'Second Moon', getDeviceId: () => deviceId },
       );
       issued = JSON.stringify(credential);
       attempt.controller.signal.throwIfAborted();
