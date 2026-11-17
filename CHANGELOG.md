@@ -12,6 +12,27 @@ This log follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [S
 - This pre-1.0 policy is a project convention; SemVer permits an unstable public API during initial development. At `1.0.0`, the public contract will be declared stable: incompatible changes increment MAJOR, compatible features MINOR, and fixes PATCH.
 - Changelog entries record versioned change batches; GitHub Release publication is a separate action requiring approval. Published versions and tags must never be silently reassigned.
 
+## 0.10.0 - 2026-11-17
+
+Incompatible change to the local service API; the workbench shows the same information.
+
+### Changed
+
+- Change events now name the areas that changed (overview, session, project files, research records or jobs) instead of sending a bare `change`. The SSE payload is now JSON, and the workbench reloads only the named areas.
+- Session snapshots accept `after` and `anchor` and resend only the messages from the last one onward. When the anchor no longer matches, for example after context compaction or a language switch, the full history is sent again.
+- `/api/overview` no longer includes jobs. The jobs panel loads logs with the new `GET /api/projects/:id/jobs` only while the panel is open, and refreshes them when that project's jobs change.
+- Running jobs save their logs only when new output arrives, at most once a second.
+
+### Fixed
+
+- Long sessions and projects with many jobs no longer slow down while a turn is streaming: the workbench no longer reloads every project, session, job log and the whole conversation each time a token arrives.
+- Chat messages parse Markdown and math again only when their own content changes.
+
+### Verification
+
+- Added tests for merging change notices, scoped notices during a turn, partial snapshots with full fallback, and job logs being left out of the overview.
+- In an isolated browser run with a streaming test model, a whole turn loaded the overview 3 times; the other 24 session requests carried only the last message. After a full page reload, the messages were identical to the incrementally merged ones. The files, research and jobs panels updated while the turn was still running.
+
 ## 0.9.0 - 2026-10-25
 
 ### Added
