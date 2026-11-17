@@ -5,9 +5,10 @@ import { message as translate } from '../errors.js';
 
 export function presentMessages(messages: AgentMessage[], locale: Locale = 'zh-CN'): ChatMessage[] {
   return messages
-    .map((message) => {
+    .map((message, index) => {
       const m = message as unknown as {
         role: string;
+        timestamp?: number;
         content?:
           | string
           | Array<{ type: string; text?: string; name?: string; arguments?: unknown }>;
@@ -29,6 +30,8 @@ export function presentMessages(messages: AgentMessage[], locale: Locale = 'zh-C
               .filter(Boolean)
               .join('\n');
       return {
+        // History index plus timestamp: compaction or a different history changes the key.
+        key: `${index}:${m.timestamp ?? ''}:${m.role}`,
         role: m.role,
         text: text || m.errorMessage || '',
         toolName: m.toolName,

@@ -39,7 +39,7 @@ export function registerFiles(context: RouteContext) {
       .object({ path: z.string(), content: z.string().max(2000000), original: z.string() })
       .parse(request.body);
     await saveText(p.path, v.path, v.content, v.original);
-    changed();
+    changed({ files: [p.id] });
     return { ok: true };
   });
 }

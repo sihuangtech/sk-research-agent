@@ -1,6 +1,7 @@
 import { type ChildProcess, spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import type { Job, Project } from '../shared/contracts.js';
+import type { Changed } from './changes.js';
 import { DomainError } from './errors.js';
 import type { Store } from './store.js';
 
@@ -8,7 +9,7 @@ export class Jobs {
   private children = new Map<string, { child: ChildProcess; job: Job; done: Promise<void> }>();
   constructor(
     private store: Store,
-    private changed: () => void,
+    private changed: Changed,
   ) {}
   async recover() {
     for (const job of await this.store.list('jobs'))
@@ -59,19 +60,25 @@ export class Jobs {
       stdio: ['ignore', 'pipe', 'pipe'],
     });
     let persist = Promise.resolve();
+    let dirty = false;
     const save = () => {
+      dirty = false;
       const copy = { ...job };
       persist = persist.then(async () => {
         await this.store.put('jobs', copy);
-        this.changed();
+        this.changed({ jobs: [project.id] });
       });
     };
     const append = (data: Buffer) => {
       job.log = (job.log + data.toString()).slice(-100_000);
+      dirty = true;
     };
     child.stdout?.on('data', append);
     child.stderr?.on('data', append);
-    const timer = setInterval(save, 1000);
+    // Save at most once a second, and only when new output arrived.
+    const timer = setInterval(() => {
+      if (dirty) save();
+    }, 1000);
     const done = new Promise<void>((resolve) => {
       child.on('error', (error) => {
         job.log += `\n${error.message}`;
@@ -82,25 +89,28 @@ export class Jobs {
         job.exitCode = code;
         if (job.status === 'running') job.status = code === 0 ? 'completed' : 'failed';
         save();
-        persist = persist.then(() =>
-          this.store.appendExecution({
-            id: randomUUID(),
-            projectId: project.id,
-            sessionId,
-            jobId: job.id,
-            callId: job.id,
-            tool: 'research_job',
-            phase:
-              job.status === 'completed'
-                ? 'completed'
-                : job.status === 'cancelled'
-                  ? 'interrupted'
-                  : 'failed',
-            createdAt: job.endedAt!,
-            exitCode: code,
-            durationMs: job.endedAt! - job.createdAt,
-          }),
-        );
+        persist = persist
+          .then(() =>
+            this.store.appendExecution({
+              id: randomUUID(),
+              projectId: project.id,
+              sessionId,
+              jobId: job.id,
+              callId: job.id,
+              tool: 'research_job',
+              phase:
+                job.status === 'completed'
+                  ? 'completed'
+                  : job.status === 'cancelled'
+                    ? 'interrupted'
+                    : 'failed',
+              createdAt: job.endedAt!,
+              exitCode: code,
+              durationMs: job.endedAt! - job.createdAt,
+            }),
+          )
+          // The command may have written files; its completion is listed with research executions.
+          .then(() => this.changed({ files: [project.id], research: [project.id] }));
         void persist.finally(() => {
           this.children.delete(job.id);
           resolve();
@@ -108,7 +118,7 @@ export class Jobs {
       });
     });
     this.children.set(job.id, { child, job, done });
-    this.changed();
+    this.changed({ jobs: [project.id], research: [project.id] });
     return job;
   }
   async cancel(id: string) {

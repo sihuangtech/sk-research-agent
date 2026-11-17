@@ -1,5 +1,7 @@
 import { invoke, isTauri } from '@tauri-apps/api/core';
+import type { ChangeNotice } from '../../shared/contracts';
 import { currentLocale, i18n, serviceMessage, syncDesktopLanguage, UiMessage } from './i18n';
+import { parseNotice } from './state/changes';
 
 export class RequestError extends Error {
   constructor(
@@ -70,9 +72,10 @@ export async function fileBlob(projectId: string, path: string) {
   if (!response.ok) await responseError(response);
   return response.blob();
 }
+/** Reports each change notice; `null` (on every connection) means reload everything. */
 export async function watchChanges(
   signal: AbortSignal,
-  changed: () => void,
+  changed: (notice: ChangeNotice | null) => void,
   connection: (online: boolean) => void,
 ) {
   while (!signal.aborted) {
@@ -83,7 +86,7 @@ export async function watchChanges(
       });
       if (!response.ok || !response.body) throw new Error(i18n.t('connectionFailed'));
       connection(true);
-      changed();
+      changed(null);
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let pending = '';
@@ -93,7 +96,8 @@ export async function watchChanges(
         pending += decoder.decode(chunk.value, { stream: true });
         const blocks = pending.split('\n\n');
         pending = blocks.pop() || '';
-        if (blocks.some((block) => block.startsWith('data:'))) changed();
+        for (const block of blocks)
+          if (block.startsWith('data:')) changed(parseNotice(block.slice(5)));
       }
     } catch {
       if (signal.aborted) return;

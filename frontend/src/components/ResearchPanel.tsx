@@ -9,7 +9,7 @@ import ResearchEntryForm from './ResearchEntryForm';
 
 export default function ResearchPanel() {
   const { t } = useTranslation();
-  const { project, projectId, revision, setError, act } = useWorkbench();
+  const { project, projectId, researchRevision, setError, act } = useWorkbench();
   const [data, setData] = useState<ResearchOverview>({ entries: [], executions: [] });
   const [view, setView] = useState<'notes' | 'executions'>('notes');
   const [query, setQuery] = useState('');
@@ -35,7 +35,7 @@ export default function ResearchPanel() {
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [projectId, query, revision, setError]);
+  }, [projectId, query, researchRevision, setError]);
   const executions = [
     ...new Map(data.executions.map((event) => [event.callId, event] as const).reverse()).values(),
   ].sort((a, b) => b.createdAt - a.createdAt);

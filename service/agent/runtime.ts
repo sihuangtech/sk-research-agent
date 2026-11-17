@@ -8,6 +8,7 @@ import {
 } from '@earendil-works/pi-coding-agent';
 import type { Conversation } from '../../shared/contracts.js';
 import type { Locale } from '../../shared/locale.js';
+import type { Changed } from '../changes.js';
 import type { Jobs } from '../jobs.js';
 import { createModelRuntime, type SecretStore } from '../providers.js';
 import type { Store } from '../store.js';
@@ -26,7 +27,7 @@ export async function createResearchSession(
   id: string,
   locale: Locale,
   query = '',
-  changed: () => void = () => {},
+  changed: Changed = () => {},
 ) {
   const project = await store.get('projects', record.projectId);
   const provider = await store.get('providers', record.providerId);

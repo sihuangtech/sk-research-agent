@@ -70,6 +70,8 @@ export interface Automation {
   locale?: import('./locale.js').Locale;
 }
 export interface ChatMessage {
+  /** Position and identity in the model history; stable once the message has ended. */
+  key: string;
   role: string;
   text: string;
   toolName?: string;
@@ -77,17 +79,27 @@ export interface ChatMessage {
 }
 export interface SessionSnapshot {
   conversation: Conversation;
+  /** Index of the first returned message. Earlier messages are unchanged on the client. */
+  from: number;
   messages: ChatMessage[];
   activeTools: string[];
   queued: string[];
 }
+/** Projects, sessions and settings. Job logs are loaded per project by the jobs panel. */
 export interface Overview {
   projects: Project[];
   sessions: Conversation[];
   providers: Provider[];
   memories: Memory[];
-  jobs: Job[];
   automations: Automation[];
+}
+/** Areas changed since the previous event. Project areas list project IDs. */
+export interface ChangeNotice {
+  overview: boolean;
+  sessions: string[];
+  files: string[];
+  research: string[];
+  jobs: string[];
 }
 export interface FileEntry {
   name: string;

@@ -10,7 +10,7 @@ import ResearchPanel from './ResearchPanel';
 export default function Inspector() {
   const { t } = useTranslation();
 
-  const { panel, setPanel, project, revision, setError, requestedFile } = useWorkbench();
+  const { panel, setPanel, project, filesRevision, setError, requestedFile } = useWorkbench();
   return (
     <aside className="inspector">
       <div className="inspector-tabs">
@@ -33,7 +33,7 @@ export default function Inspector() {
         <FilePanel
           key={`${project?.id}:${requestedFile}`}
           project={project}
-          revision={revision}
+          revision={filesRevision}
           onError={setError}
           initialPath={requestedFile}
         />

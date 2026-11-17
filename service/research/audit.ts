@@ -31,6 +31,7 @@ export class ExecutionAudit {
     private projectId: string,
     private sessionId: string,
     private root: string,
+    private appended: () => void = () => {},
   ) {}
   observe(event: AgentSessionEvent) {
     if (event.type !== 'tool_execution_start' && event.type !== 'tool_execution_end') return;
@@ -75,6 +76,7 @@ export class ExecutionAudit {
   }
   private async append(event: Omit<ExecutionEvent, 'id'>) {
     await this.store.appendExecution({ ...event, id: randomUUID() });
+    this.appended();
   }
   async finish() {
     await this.queue;

@@ -8,6 +8,7 @@ import type { Conversation, SessionSnapshot } from '../shared/contracts.js';
 import type { Locale } from '../shared/locale.js';
 import { presentMessages } from './agent/messages.js';
 import { createResearchSession } from './agent/runtime.js';
+import type { Changed } from './changes.js';
 import { DomainError } from './errors.js';
 import type { Jobs } from './jobs.js';
 import { type SecretStore } from './providers.js';
@@ -35,7 +36,7 @@ export class ResearchAgent {
     private jobs: Jobs,
     private secrets: SecretStore,
     private dataDir: string,
-    private changed: () => void,
+    private changed: Changed,
   ) {}
   async recover() {
     for (const session of await this.store.list('sessions'))
@@ -68,7 +69,13 @@ export class ResearchAgent {
     this.changed();
     return conversation;
   }
-  async snapshot(id: string, locale: Locale = 'zh-CN'): Promise<SessionSnapshot> {
+  /** `after` and `anchor` let a client that already holds earlier messages receive only the rest. */
+  async snapshot(
+    id: string,
+    locale: Locale = 'zh-CN',
+    after = 0,
+    anchor = '',
+  ): Promise<SessionSnapshot> {
     const conversation = await this.store.get('sessions', id);
     const live = this.live.get(id);
     let messages = live?.session
@@ -83,9 +90,13 @@ export class ResearchAgent {
         messages = [...messages.slice(0, -1), live.partial];
       else messages.push(live.partial);
     }
+    const presented = presentMessages(messages, locale);
+    // Send everything again when the anchor moved, e.g. after compaction or a language change.
+    const from = after > 0 && presented[after - 1]?.key === anchor ? after : 0;
     return {
       conversation,
-      messages: presentMessages(messages, locale),
+      from,
+      messages: presented.slice(from),
       activeTools: [...(live?.activeTools || [])],
       queued: live?.queued || [],
     };
@@ -105,7 +116,7 @@ export class ResearchAgent {
         });
       await active.session[mode](text);
       active.queued.push(text);
-      this.changed();
+      this.changed({ sessions: [id] });
       return;
     }
     let ready!: () => void;
@@ -142,8 +153,11 @@ export class ResearchAgent {
         this.changed,
       );
       state.session = session;
-      const project = await this.store.get('projects', record.projectId);
-      state.audit = new ExecutionAudit(this.store, record.projectId, id, project.path);
+      const { projectId } = record;
+      const project = await this.store.get('projects', projectId);
+      state.audit = new ExecutionAudit(this.store, projectId, id, project.path, () =>
+        this.changed({ research: [projectId] }),
+      );
       await this.store.put('sessions', {
         ...(await this.store.get('sessions', id)),
         sessionFile: session.sessionFile!,
@@ -157,10 +171,12 @@ export class ResearchAgent {
         }
         if (event.type === 'tool_execution_start') state.activeTools.add(event.toolName);
         if (event.type === 'tool_execution_end') state.activeTools.delete(event.toolName);
-        this.changed();
+        // Streaming updates touch only this session; finished tools may also have changed files.
+        const files = event.type === 'tool_execution_end' ? [projectId] : [];
+        this.changed({ sessions: [id], files });
       });
       state.done = this.run(id, text, session, state);
-      this.changed();
+      this.changed({ overview: true, sessions: [id] });
     } catch (error) {
       state.session?.dispose();
       if (record)
@@ -172,7 +188,7 @@ export class ResearchAgent {
           updatedAt: Date.now(),
         });
       this.live.delete(id);
-      this.changed();
+      this.changed({ overview: true, sessions: [id] });
       throw error;
     } finally {
       ready();
@@ -194,15 +210,18 @@ export class ResearchAgent {
         error = String(recordError);
       }
       session.dispose();
+      const finished = await this.store.get('sessions', id);
       await this.store.put('sessions', {
-        ...(await this.store.get('sessions', id)),
+        ...finished,
         status: state.aborting ? 'interrupted' : error ? 'error' : 'idle',
         error: state.aborting ? undefined : error,
         errorCode: state.aborting ? 'sessionStopped' : undefined,
         updatedAt: Date.now(),
       });
       this.live.delete(id);
-      this.changed();
+      // The handoff is a research record; the turn may have written files.
+      const project = [finished.projectId];
+      this.changed({ overview: true, sessions: [id], files: project, research: project });
     }
   }
   async abort(id: string) {

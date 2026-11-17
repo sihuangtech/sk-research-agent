@@ -1,4 +1,5 @@
 import type { ToolDefinition } from '@earendil-works/pi-coding-agent';
+import type { Changed } from '../changes.js';
 import { Type } from 'typebox';
 import { DomainError, message, type MessageCode } from '../errors.js';
 import type { Locale } from '../../shared/locale.js';
@@ -11,7 +12,7 @@ export function notebookTools(
   projectId: string,
   sessionId: string,
   locale: Locale,
-  changed: () => void,
+  changed: Changed,
 ): ToolDefinition[] {
   const notebook = new Notebook(store);
   const reply = (data: unknown) => ({
@@ -74,7 +75,7 @@ export function notebookTools(
       }),
       async (args) => {
         const entry = await notebook.record(projectId, { ...args, sessionId }, 'agent');
-        changed();
+        changed({ research: [projectId] });
         return entry;
       },
     ),

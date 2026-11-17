@@ -15,8 +15,9 @@ export function registerResearch({ app, store, changed }: RouteContext) {
     };
   });
   app.post('/api/projects/:id/research', async (request) => {
-    const entry = await notebook.record(id(request.params), request.body, 'user');
-    changed();
+    const projectId = id(request.params);
+    const entry = await notebook.record(projectId, request.body, 'user');
+    changed({ research: [projectId] });
     return entry;
   });
   app.get('/api/projects/:id/research/export', async (request, reply) => {

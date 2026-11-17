@@ -8,7 +8,6 @@ export function registerOverview(context: RouteContext) {
     providers: await store.list('providers'),
     sessions: (await store.list('sessions')).sort((a, b) => b.updatedAt - a.updatedAt),
     memories: await store.list('memories'),
-    jobs: (await store.list('jobs')).sort((a, b) => b.createdAt - a.createdAt),
     automations: await store.list('automations'),
   }));
 }

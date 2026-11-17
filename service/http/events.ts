@@ -1,5 +1,6 @@
 import type { EventEmitter } from 'node:events';
 import type { FastifyInstance } from 'fastify';
+import type { ChangeNotice } from '../../shared/contracts.js';
 export function registerEvents(app: FastifyInstance, events: EventEmitter) {
   app.get('/api/events', async (request, reply) => {
     reply.hijack();
@@ -9,10 +10,11 @@ export function registerEvents(app: FastifyInstance, events: EventEmitter) {
       Connection: 'keep-alive',
       ...(request.headers.origin ? { 'Access-Control-Allow-Origin': request.headers.origin } : {}),
     });
-    const emit = () => {
-      if (!reply.raw.destroyed) reply.raw.write('data: change\n\n');
+    const emit = (notice: ChangeNotice) => {
+      if (!reply.raw.destroyed) reply.raw.write(`data: ${JSON.stringify(notice)}\n\n`);
     };
-    emit();
+    // Flush headers. The client loads everything itself after each connection.
+    reply.raw.write(': connected\n\n');
     events.on('change', emit);
     const heartbeat = setInterval(() => {
       if (!reply.raw.destroyed) reply.raw.write(': heartbeat\n\n');

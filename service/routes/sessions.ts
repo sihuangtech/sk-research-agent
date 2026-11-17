@@ -10,9 +10,15 @@ export function registerSessions(context: RouteContext) {
       .parse(request.body);
     return agent.create(v.projectId, v.providerId);
   });
-  app.get('/api/sessions/:id', (request) =>
-    agent.snapshot(id(request.params), requestLocale(request)),
-  );
+  app.get('/api/sessions/:id', (request) => {
+    const query = z
+      .object({
+        after: z.coerce.number().int().min(0).default(0),
+        anchor: z.string().max(200).default(''),
+      })
+      .parse(request.query);
+    return agent.snapshot(id(request.params), requestLocale(request), query.after, query.anchor);
+  });
   app.post('/api/sessions/:id/messages', async (request) => {
     const input = z
       .object({

@@ -1,6 +1,7 @@
 import { EventEmitter } from 'node:events';
 import Fastify from 'fastify';
 import { ResearchAgent } from './agent.js';
+import { createChangeFeed } from './changes.js';
 import { DomainError } from './errors.js';
 import { registerEvents } from './http/events.js';
 import { registerSecurity } from './http/security.js';
@@ -30,14 +31,8 @@ export async function createServer(options: {
   const secrets = options.secrets || new KeychainSecrets();
   const events = new EventEmitter();
   events.setMaxListeners(50);
-  let changeTimer: NodeJS.Timeout | undefined;
-  const changed = () => {
-    if (!changeTimer)
-      changeTimer = setTimeout(() => {
-        changeTimer = undefined;
-        events.emit('change');
-      }, 100);
-  };
+  const feed = createChangeFeed((notice) => events.emit('change', notice));
+  const { changed } = feed;
   const jobs = new Jobs(store, changed);
   const agent = new ResearchAgent(store, jobs, secrets, options.dataDir, changed);
   await jobs.recover();
@@ -57,7 +52,7 @@ export async function createServer(options: {
   registerResearch(context);
   const scheduler = createScheduler(store, agent, options.scheduler !== false);
   app.addHook('preClose', async () => {
-    if (changeTimer) clearTimeout(changeTimer);
+    feed.close();
     events.emit('shutdown');
     await scheduler.stop();
     await agent.stop();

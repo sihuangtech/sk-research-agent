@@ -2,16 +2,23 @@ import { isTauri } from '@tauri-apps/api/core';
 import { open } from '@tauri-apps/plugin-dialog';
 import { type FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Conversation, Overview, Project, SessionSnapshot } from '../../../shared/contracts';
+import type {
+  ChangeNotice,
+  Conversation,
+  Overview,
+  Project,
+  SessionSnapshot,
+} from '../../../shared/contracts';
+import { mergeSnapshot, snapshotQuery } from '../../../shared/snapshot';
 import { request, watchChanges } from '../api';
 import { preferredConnection } from '../preferences';
+import { type PendingRefresh, queueRefresh, sessionNotice } from '../state/changes';
 
 const empty: Overview = {
   projects: [],
   sessions: [],
   providers: [],
   memories: [],
-  jobs: [],
   automations: [],
 };
 
@@ -21,7 +28,13 @@ export function useWorkbenchController() {
   const [data, setData] = useState<Overview>(empty);
   const [projectId, setProjectId] = useState('');
   const [sessionId, setSessionId] = useState('');
-  const [snapshot, setSnapshot] = useState<SessionSnapshot | null>(null);
+  const [snapshot, setSnapshotState] = useState<SessionSnapshot | null>(null);
+  // Base for partial snapshot requests; always the snapshot that is on screen.
+  const shown = useRef<SessionSnapshot | null>(null);
+  const setSnapshot = useCallback((value: SessionSnapshot | null) => {
+    shown.current = value;
+    setSnapshotState(value);
+  }, []);
   const [providerId, setProviderId] = useState('');
   const [text, setText] = useState('');
   const [mode, setMode] = useState<'steer' | 'followUp'>('steer');
@@ -35,36 +48,53 @@ export function useWorkbenchController() {
   const [error, setError] = useState<unknown>('');
   const [online, setOnline] = useState(false);
   const [sending, setSending] = useState(false);
-  const [revision, setRevision] = useState(0);
+  const [filesRevision, setFilesRevision] = useState(0);
+  const [researchRevision, setResearchRevision] = useState(0);
+  const [jobsRevision, setJobsRevision] = useState(0);
   const chatEnd = useRef<HTMLDivElement>(null);
   const selection = useRef({ projectId, sessionId });
   selection.current = { projectId, sessionId };
   const loading = useRef(false);
-  const pending = useRef(false);
-  const refresh = useCallback(async () => {
-    if (loading.current) {
-      pending.current = true;
-      return;
-    }
-    loading.current = true;
-    try {
-      do {
-        pending.current = false;
-        const next = await request<Overview>('/overview');
-        setData(next);
-        const selected = selection.current.sessionId;
-        if (selected) {
-          const s = await request<SessionSnapshot>(`/sessions/${selected}`);
-          if (selection.current.sessionId === selected) setSnapshot(s);
+  const queued = useRef<PendingRefresh | null>(null);
+  const loadSnapshot = useCallback(
+    async (selected: string, full: boolean) => {
+      const base = full ? null : shown.current;
+      const next = await request<SessionSnapshot>(
+        `/sessions/${selected}${snapshotQuery(base, selected)}`,
+      );
+      const merged =
+        mergeSnapshot(base, next) || (await request<SessionSnapshot>(`/sessions/${selected}`));
+      if (selection.current.sessionId === selected) setSnapshot(merged);
+    },
+    [setSnapshot],
+  );
+  // Loads only the areas named by change notices; `null` reloads everything.
+  const sync = useCallback(
+    async (notice: ChangeNotice | null) => {
+      queued.current = queueRefresh(queued.current, notice);
+      if (loading.current) return;
+      loading.current = true;
+      try {
+        while (queued.current) {
+          const work = queued.current;
+          queued.current = null;
+          const { projectId: current, sessionId: selected } = selection.current;
+          if (work.full || work.overview) setData(await request<Overview>('/overview'));
+          if (selected && (work.full || work.sessions.has(selected)))
+            await loadSnapshot(selected, work.full);
+          if (work.full || work.files.has(current)) setFilesRevision((v) => v + 1);
+          if (work.full || work.research.has(current)) setResearchRevision((v) => v + 1);
+          if (work.full || work.jobs.has(current)) setJobsRevision((v) => v + 1);
         }
-        setRevision((v) => v + 1);
-      } while (pending.current);
-    } catch (e) {
-      setError(e);
-    } finally {
-      loading.current = false;
-    }
-  }, []);
+      } catch (e) {
+        setError(e);
+      } finally {
+        loading.current = false;
+      }
+    },
+    [loadSnapshot],
+  );
+  const refresh = useCallback(() => sync(null), [sync]);
   useEffect(() => {
     void refresh();
   }, [i18n.resolvedLanguage, refresh]);
@@ -72,13 +102,13 @@ export function useWorkbenchController() {
     const controller = new AbortController();
     void watchChanges(
       controller.signal,
-      () => {
-        void refresh();
+      (notice) => {
+        void sync(notice);
       },
       setOnline,
     );
     return () => controller.abort();
-  }, [refresh]);
+  }, [sync]);
   useEffect(() => {
     if (!projectId && data.projects.length) setProjectId(data.projects[0].id);
     if (!data.providers.some((p) => p.id === providerId))
@@ -98,8 +128,8 @@ export function useWorkbenchController() {
   }, []);
   useEffect(() => {
     setSnapshot(null);
-    if (sessionId) void refresh();
-  }, [sessionId, refresh]);
+    if (sessionId) void sync(sessionNotice(sessionId));
+  }, [sessionId, setSnapshot, sync]);
   useEffect(() => {
     chatEnd.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [snapshot?.messages.length, snapshot?.activeTools.length]);
@@ -192,7 +222,9 @@ export function useWorkbenchController() {
     setError,
     online,
     sending,
-    revision,
+    filesRevision,
+    researchRevision,
+    jobsRevision,
     chatEnd,
     refresh,
     project,

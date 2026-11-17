@@ -71,7 +71,7 @@ test('desktop cross-origin preflights allow authenticated mutations but not fore
   }
 });
 
-test('authenticated SSE sends initial state and closes cleanly with the service', async () => {
+test('authenticated SSE connects, sends scoped change notices and closes cleanly', async () => {
   const f = await fixture();
   try {
     const address = await f.server.app.listen({ host: '127.0.0.1', port: 0 });
@@ -81,8 +81,17 @@ test('authenticated SSE sends initial state and closes cleanly with the service'
     assert.equal(response.status, 200);
     assert.equal(response.headers.get('access-control-allow-origin'), 'tauri://localhost');
     const reader = response.body!.getReader();
-    const first = await reader.read();
-    assert.match(new TextDecoder().decode(first.value), /data: change/);
+    const decoder = new TextDecoder();
+    assert.match(decoder.decode((await reader.read()).value), /^: connected/);
+    await f.call('/memories', 'POST', { content: 'Prefer SI units.' });
+    const notice = decoder.decode((await reader.read()).value);
+    assert.deepEqual(JSON.parse(notice.replace(/^data: /, '')), {
+      overview: true,
+      sessions: [],
+      files: [],
+      research: [],
+      jobs: [],
+    });
     await reader.cancel();
   } finally {
     await f.close();
