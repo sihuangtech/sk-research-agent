@@ -8,8 +8,14 @@ import { useWorkbench } from '../state/WorkbenchContext';
 
 export default function JobsPanel() {
   const { t } = useTranslation();
+  const { t: partner } = useTranslation('partner');
 
-  const { projectId, project, act, jobsRevision, setError } = useWorkbench();
+  const { projectId, project, act, jobsRevision, setError, setRequestedFile, setPanel } =
+    useWorkbench();
+  const openArtifact = (path: string) => {
+    setRequestedFile(path);
+    setPanel('files');
+  };
   const [jobs, setJobs] = useState<Job[]>([]);
   useEffect(() => setJobs([]), [projectId]);
   // Logs are loaded only while this panel is open, and again whenever this project's jobs change.
@@ -61,6 +67,16 @@ export default function JobsPanel() {
           </small>
           {j.noticeCode && <p>{serviceMessage(j.noticeCode)}</p>}
           <pre>{j.log || t('waitingOutput')}</pre>
+          {Boolean(j.artifacts?.length) && (
+            <div className="job-artifacts">
+              <small>{partner('artifacts')}</small>
+              {j.artifacts!.map((path) => (
+                <button key={path} onClick={() => openArtifact(path)}>
+                  {path}
+                </button>
+              ))}
+            </div>
+          )}
           {j.status === 'running' && (
             <button onClick={() => void act(() => request(`/jobs/${j.id}/cancel`, 'POST'))}>
               {t('cancelJob')}

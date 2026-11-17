@@ -62,5 +62,20 @@
   "modelCatalogFailed": "Impossible de charger les modèles du compte. Vérifiez la connexion.",
   "signOutFirst": "Déconnectez-vous avant de retirer cette connexion.",
   "connectionTestFailed": "Échec du test. Vérifiez le modèle enregistré, les identifiants et les limites.",
-  "interactivePlanOnly": "Ce forfait est réservé à l'usage interactif. Choisissez une API ou un modèle local pour les tâches planifiées."
+  "interactivePlanOnly": "Ce forfait est réservé à l'usage interactif. Choisissez une API ou un modèle local pour les tâches planifiées.",
+  "guardProtected": "Ce chemin est protégé (lecture seule). Si une modification est vraiment nécessaire, le chercheur peut lever la protection dans le panneau Protection.",
+  "guardDenied": "Le chercheur n’a pas approuvé cette action. Ne la contournez pas autrement ; expliquez pourquoi et demandez la suite.",
+  "guardUnattended": "Cette exécution est sans surveillance : les actions qui demandent l’accord du chercheur ne sont pas effectuées. Décrivez ce qu’il faudrait faire dans votre compte rendu et laissez-le décider.",
+  "memoryProposeLabel": "Proposer un souvenir",
+  "memoryProposeDescription": "Propose de retenir une préférence ou un fait durable sur le chercheur (nom à utiliser, domaine, outils habituels, style d’écriture, échéances), avec une raison. Ne prend effet qu’après sa confirmation. Pas pour des suppositions ni des conclusions de recherche.",
+  "memoryProposalLimit": "Cinq propositions de souvenir attendent déjà ; attendez que le chercheur les examine.",
+  "memoryProposedNote": "Envoyé au chercheur pour confirmation ; non utilisé avant.",
+  "reportSaveLabel": "Enregistrer le compte rendu",
+  "reportSaveDescription": "Enregistre un compte rendu Markdown dans le dossier reports du projet. Chaque conclusion doit citer un enregistrement de recherche sous la forme [#8 premiers caractères de l’ID] ; les citations d’enregistrements inexistants sont refusées.",
+  "reportCitationsMissing": "Aucun enregistrement ne correspond à ces citations : {{ids}}. Utilisez les ID d’enregistrements réels ou supprimez les conclusions sans appui.",
+  "reportCitationsRequired": "Le compte rendu ne cite aucun enregistrement. Indiquez l’appui de chaque conclusion sous la forme [#8 premiers caractères de l’ID].",
+  "reportNoRecords": "Aucun enregistrement de recherche sur cette période ; impossible de rédiger un compte rendu.",
+  "checkpointBusy": "Une session de ce projet est encore en cours. Attendez sa fin ou arrêtez-la avant de restaurer.",
+  "checkpointUnavailable": "Impossible de créer un point de restauration : il faut Git, au plus 20 000 fichiers et au plus 1 Go hors chemins protégés.",
+  "protectedPathInvalid": "Indiquez un fichier ou dossier existant dans le projet (pas sa racine)."
 }

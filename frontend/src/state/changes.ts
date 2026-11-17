@@ -29,7 +29,7 @@ export function queueRefresh(pending: PendingRefresh | null, notice: ChangeNotic
   return next;
 }
 export function sessionNotice(sessionId: string): ChangeNotice {
-  return { overview: false, sessions: [sessionId], files: [], research: [], jobs: [] };
+  return { overview: false, sessions: [sessionId], files: [], research: [], jobs: [], alerts: [] };
 }
 /** Reads one SSE `data:` payload. An unreadable notice falls back to a full reload. */
 export function parseNotice(data: string): ChangeNotice | null {
@@ -37,7 +37,7 @@ export function parseNotice(data: string): ChangeNotice | null {
     const notice = JSON.parse(data) as Partial<ChangeNotice>;
     if (typeof notice.overview !== 'boolean') return null;
     for (const area of areas) if (!Array.isArray(notice[area])) return null;
-    return notice as ChangeNotice;
+    return { ...notice, alerts: Array.isArray(notice.alerts) ? notice.alerts : [] } as ChangeNotice;
   } catch {
     return null;
   }

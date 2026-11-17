@@ -8,6 +8,7 @@ import zh from '../../frontend/src/i18n/locales/zh-CN.json' with { type: 'json' 
 import serviceEn from '../../shared/locales/en.json' with { type: 'json' };
 import { serviceCatalogs } from '../../shared/translations.js';
 import responseLanguages from '../agent/response-languages.json' with { type: 'json' };
+import { partnerCatalogs } from '../../frontend/src/i18n/partner.js';
 import { settingsCatalogs } from '../../frontend/src/i18n/settings.js';
 import { fixture, modelFixture, provider, waitFor } from './helpers.js';
 
@@ -26,6 +27,7 @@ test('Every registered language has complete UI, service and response resources'
       [en, ui],
       [serviceEn, serviceCatalogs[locale]],
       [settingsCatalogs.en, settingsCatalogs[locale]],
+      [partnerCatalogs.en, partnerCatalogs[locale]],
     ]) {
       assert.deepEqual(Object.keys(left).sort(), Object.keys(right).sort());
       for (const key of Object.keys(left)) {

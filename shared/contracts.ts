@@ -25,6 +25,8 @@ export interface Project {
   name: string;
   path: string;
   createdAt: number;
+  /** Project-relative paths the agent may read but never change, e.g. raw data. */
+  protectedPaths?: string[];
 }
 export interface Conversation {
   id: string;
@@ -37,6 +39,8 @@ export interface Conversation {
   status: 'idle' | 'running' | 'interrupted' | 'error';
   error?: string;
   errorCode?: string;
+  /** Language of the latest turn, used for app-initiated follow-ups. */
+  locale?: import('./locale.js').Locale;
 }
 export interface Memory {
   id: string;
@@ -44,6 +48,10 @@ export interface Memory {
   content: string;
   source: string;
   updatedAt: number;
+  /** Agent proposals wait for the researcher; only confirmed memories reach the model. */
+  status?: 'proposed';
+  /** Why the agent proposed it, shown next to the proposal. */
+  reason?: string;
 }
 export interface Job {
   id: string;
@@ -56,6 +64,8 @@ export interface Job {
   exitCode?: number | null;
   log: string;
   noticeCode?: string;
+  /** Project files the command created or changed, found by comparing the workspace. */
+  artifacts?: string[];
 }
 export interface Automation {
   id: string;
@@ -67,6 +77,8 @@ export interface Automation {
   nextRunAt: number;
   enabled: boolean;
   lastSessionId?: string;
+  /** `review` runs read and summarize only; it cannot run commands or edit files. */
+  profile?: import('./partner.js').ToolProfile;
   locale?: import('./locale.js').Locale;
 }
 export interface ChatMessage {
@@ -84,6 +96,8 @@ export interface SessionSnapshot {
   messages: ChatMessage[];
   activeTools: string[];
   queued: string[];
+  /** Risky actions in this session waiting for the researcher. */
+  approvals: import('./partner.js').Approval[];
 }
 /** Projects, sessions and settings. Job logs are loaded per project by the jobs panel. */
 export interface Overview {
@@ -100,6 +114,8 @@ export interface ChangeNotice {
   files: string[];
   research: string[];
   jobs: string[];
+  /** Things worth telling the researcher about, e.g. as a system notification. */
+  alerts: import('./partner.js').Alert[];
 }
 export interface FileEntry {
   name: string;

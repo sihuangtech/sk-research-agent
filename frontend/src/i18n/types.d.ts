@@ -10,6 +10,7 @@ declare module 'i18next' {
       translation: typeof zh;
       service: typeof service;
       settings: typeof import('./settings/zh-CN.json');
+      partner: typeof import('./partner/zh-CN.json');
     };
   }
 }

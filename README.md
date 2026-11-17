@@ -17,9 +17,12 @@ Work from a paper or an idea to analysis scripts, experiments and research outpu
 - **Analyze data and run experiments**: inspect data, write or revise scripts, execute local commands and save results and charts in the project. Project environments such as Python, R and Julia must be installed separately.
 - **Collaborate during execution**: follow streaming answers and tool results, steer an active task, queue a follow-up or stop the current turn. Run lengthy commands as independent jobs, inspect their status and recent logs, and cancel them separately.
 - **Inspect and edit outputs**: browse files, edit text and code, and preview PDFs and images. Responses support Markdown, tables and mathematical notation. The editor detects changes made by other programs before saving.
-- **Keep research context**: save personal preferences and project memory for future turns, then edit or delete them whenever needed.
+- **A partner that stays with you**: Second Moon is warm but honest about evidence and never tells you what you hope to hear. When it learns your name, field or deadlines it proposes remembering them, and nothing is used until you confirm. Edit or delete memory at any time.
+- **Follow-up without being asked**: when a background run it started ends, it comes back to report and suggest a next step (that turn is read-only; you decide). Turn on a daily research brief, and get system notifications while the window is in the background.
 - **Build a research history**: save questions, hypotheses, evidence, experiments, decisions and next steps, and retrieve them across sessions. Each turn leaves an explicitly unreviewed Agent handoff.
-- **Inspect sources and execution**: fingerprint local sources and artifacts with SHA-256, match PDF excerpts against a specific page, and detect file changes. Keep research notes separate from app-recorded tool and background-command events, and export the full history as JSON.
+- **Inspect sources and execution**: fingerprint local sources and artifacts with SHA-256, match PDF excerpts against a specific page, and detect file changes. Files created or changed by shell commands and background jobs are registered with the execution that produced them. Research notes stay separate from app-recorded events, and the full history exports as JSON.
+- **Safeguard data and restore**: mark raw data and other paths as protected so the agent can only read them; deleting, installing packages, uploading and admin commands wait for your approval; a checkpoint is saved before every turn that may change files, and restoring one can itself be undone.
+- **Write reports**: draft a weekly report or group meeting outline from recent research records, with every conclusion citing a record ID; citations of records that do not exist are rejected.
 - **Schedule ongoing research**: set up recurring tasks, such as finding new papers and updating literature notes. Every run creates a conversation so you can inspect its process and results.
 
 ## Get started
@@ -96,10 +99,11 @@ For browser development, run `npm run dev` and open `http://127.0.0.1:5173`. Dev
 ## Current limits
 
 - Scientific claims in notes still need review. Excerpt matching checks text, fingerprints describe capture-time file state, and URLs are not fetched or verified automatically. Each source file is limited to 50 MB.
-- Execution events come from actual tool and background-command activity. Write/edit targets can receive fingerprints; arbitrary shell outputs need explicit registration. Records do not capture complete Python/R environments, provide OS-level tamper resistance, or perform automatic statistical review.
+- Execution events come from actual tool and background-command activity. Shell and job outputs are found by comparing file sizes and modification times before and after (up to 20,000 files compared and 100 registered per run). Records do not capture complete Python/R environments, provide OS-level tamper resistance, or perform automatic statistical review.
 - PDF reading extracts text layers, without OCR. Check complex formulas, tables and figures against the original document.
 - Literature search provides publication metadata and source links, not a substitute for reading papers and verifying scientific claims.
-- Files and commands run with your user permissions. The project folder is not an operating-system sandbox; per-command approval and container isolation are not implemented.
+- Files and commands run with your user permissions. The project folder is not an operating-system sandbox and there is no container isolation. Approval decisions are based on command text and cannot recognise every risky form; protected paths are enforced for file-editing tools but only detected on a best-effort basis in shell commands. Unattended scheduled runs and follow-ups refuse actions that would need approval.
+- Checkpoints need Git installed. They live in the app data folder, never in the project's own Git, skip files over 20 MB and protected paths, and are not created for projects with more than 20,000 files or 1 GB.
 - The workbench provides code editing and command logs, without an interactive terminal, managed notebook kernels, remote cluster execution or a full IDE debugger.
 
 ## License

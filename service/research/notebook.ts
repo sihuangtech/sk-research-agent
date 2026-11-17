@@ -60,7 +60,11 @@ export class Notebook {
         const title = entry.title.toLocaleLowerCase();
         const text = `${entry.content} ${JSON.stringify(entry.sources)}`.toLocaleLowerCase();
         const score = tokens.reduce(
-          (sum, token) => sum + (title.includes(token) ? 4 : 0) + (text.includes(token) ? 1 : 0),
+          (sum, token) =>
+            sum +
+            (token.length >= 8 && entry.id.startsWith(token.replace(/^#/, '')) ? 8 : 0) +
+            (title.includes(token) ? 4 : 0) +
+            (text.includes(token) ? 1 : 0),
           0,
         );
         return { entry, score };

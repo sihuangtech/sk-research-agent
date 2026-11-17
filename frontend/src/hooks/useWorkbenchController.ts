@@ -13,6 +13,7 @@ import { mergeSnapshot, snapshotQuery } from '../../../shared/snapshot';
 import { request, watchChanges } from '../api';
 import { preferredConnection } from '../preferences';
 import { type PendingRefresh, queueRefresh, sessionNotice } from '../state/changes';
+import { useAlerts } from './useAlerts';
 
 const empty: Overview = {
   projects: [],
@@ -38,9 +39,9 @@ export function useWorkbenchController() {
   const [providerId, setProviderId] = useState('');
   const [text, setText] = useState('');
   const [mode, setMode] = useState<'steer' | 'followUp'>('steer');
-  const [panel, setPanel] = useState<'files' | 'research' | 'jobs' | 'memory' | 'automations'>(
-    'files',
-  );
+  const [panel, setPanel] = useState<
+    'files' | 'research' | 'jobs' | 'memory' | 'automations' | 'safeguards'
+  >('files');
   const [requestedFile, setRequestedFile] = useState('');
   useEffect(() => setRequestedFile(''), [projectId]);
   const [settings, setSettings] = useState(false);
@@ -54,6 +55,9 @@ export function useWorkbenchController() {
   const chatEnd = useRef<HTMLDivElement>(null);
   const selection = useRef({ projectId, sessionId });
   selection.current = { projectId, sessionId };
+  const openSession = useCallback(() => selection.current.sessionId, []);
+  const { alerts, pushAlerts, dismissAlert, describeAlert, settleApprovals } =
+    useAlerts(openSession);
   const loading = useRef(false);
   const queued = useRef<PendingRefresh | null>(null);
   const loadSnapshot = useCallback(
@@ -64,13 +68,16 @@ export function useWorkbenchController() {
       );
       const merged =
         mergeSnapshot(base, next) || (await request<SessionSnapshot>(`/sessions/${selected}`));
-      if (selection.current.sessionId === selected) setSnapshot(merged);
+      if (selection.current.sessionId !== selected) return;
+      setSnapshot(merged);
+      if (!merged.approvals?.length) settleApprovals(selected);
     },
-    [setSnapshot],
+    [setSnapshot, settleApprovals],
   );
   // Loads only the areas named by change notices; `null` reloads everything.
   const sync = useCallback(
     async (notice: ChangeNotice | null) => {
+      if (notice?.alerts?.length) pushAlerts(notice.alerts);
       queued.current = queueRefresh(queued.current, notice);
       if (loading.current) return;
       loading.current = true;
@@ -92,7 +99,7 @@ export function useWorkbenchController() {
         loading.current = false;
       }
     },
-    [loadSnapshot],
+    [loadSnapshot, pushAlerts],
   );
   const refresh = useCallback(() => sync(null), [sync]);
   useEffect(() => {
@@ -225,6 +232,9 @@ export function useWorkbenchController() {
     filesRevision,
     researchRevision,
     jobsRevision,
+    alerts,
+    dismissAlert,
+    describeAlert,
     chatEnd,
     refresh,
     project,

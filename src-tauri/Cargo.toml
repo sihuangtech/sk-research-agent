@@ -1,6 +1,6 @@
 [package]
 name = "agentic-research"
-version = "0.10.0"
+version = "0.11.0"
 description = "Second Moon, your local-first personal research agent"
 authors = ["SK Studio"]
 license = "GPL-3.0-only"
@@ -27,3 +27,4 @@ tauri-plugin-shell = "2"
 uuid = { version = "1.20.0", features = ["v4"] }
 tauri-plugin-dialog = "2.7.2"
 tauri-plugin-single-instance = "2.4.3"
+tauri-plugin-notification = "2.3.3"

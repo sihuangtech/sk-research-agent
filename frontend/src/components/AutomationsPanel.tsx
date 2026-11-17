@@ -6,12 +6,30 @@ import { useWorkbench } from '../state/WorkbenchContext';
 
 export default function AutomationsPanel() {
   const { t } = useTranslation();
+  const { t: partner } = useTranslation('partner');
 
   const { data, projectId, setSessionId, providerId, project, act } = useWorkbench();
   return (
     <section className="panel-content">
       <h2>{t('automationsTitle')}</h2>
       <p className="muted">{t('automationsDescription')}</p>
+      <div className="record brief-card">
+        <strong>{partner('briefTitle')}</strong>
+        <p>{partner('briefDescription')}</p>
+        {data.automations.some((a) => a.projectId === projectId && a.profile === 'review') ? (
+          <small>{partner('briefEnabled')}</small>
+        ) : (
+          <button
+            className="primary"
+            disabled={!project || !providerId}
+            onClick={() =>
+              void act(() => request(`/projects/${projectId}/brief`, 'POST', { providerId }))
+            }
+          >
+            {partner('briefEnable')}
+          </button>
+        )}
+      </div>
       <form
         onSubmit={(e) => {
           e.preventDefault();

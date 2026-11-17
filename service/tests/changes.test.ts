@@ -13,7 +13,7 @@ test('change feed merges a window into one notice and ignores changes after clos
   feed.changed();
   await new Promise((resolve) => setTimeout(resolve, 40));
   assert.deepEqual(notices, [
-    { overview: true, sessions: ['a', 'b'], files: ['p'], research: [], jobs: [] },
+    { overview: true, sessions: ['a', 'b'], files: ['p'], research: [], jobs: [], alerts: [] },
   ]);
   feed.changed({ research: ['p'] });
   feed.close();

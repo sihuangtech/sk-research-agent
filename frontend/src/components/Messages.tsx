@@ -10,6 +10,7 @@ import 'katex/dist/katex.min.css';
 import type { ChatMessage } from '../../../shared/contracts';
 import { serviceMessage } from '../i18n';
 import { useWorkbench } from '../state/WorkbenchContext';
+import ApprovalCards from './ApprovalCards';
 
 const same = (a: ChatMessage, b: ChatMessage) =>
   a.text === b.text && a.role === b.role && a.isError === b.isError && a.toolName === b.toolName;
@@ -18,6 +19,8 @@ const same = (a: ChatMessage, b: ChatMessage) =>
 const MessageItem = memo(
   function MessageItem({ message }: { message: ChatMessage }) {
     const { t } = useTranslation();
+    // Things the app started, such as a follow-up after a background job.
+    if (message.role === 'event') return <div className="event-note">{message.text}</div>;
     return (
       <article
         className={`message ${message.role === 'user' ? 'user' : message.role === 'toolResult' ? 'tool' : 'assistant'}`}
@@ -74,6 +77,7 @@ export default function Messages() {
           {t('working')}
         </div>
       )}
+      <ApprovalCards />
       {snapshot?.queued.map((q, i) => (
         <div className="queued" key={i}>
           {t('queuedGuidance', { text: q })}

@@ -3,10 +3,13 @@ import { randomUUID } from 'node:crypto';
 import type { Job, Project } from '../shared/contracts.js';
 import type { Changed } from './changes.js';
 import { DomainError } from './errors.js';
+import { captureArtifacts, scanWorkspace } from './research/workspace.js';
 import type { Store } from './store.js';
 
 export class Jobs {
   private children = new Map<string, { child: ChildProcess; job: Job; done: Promise<void> }>();
+  /** Called once a job has ended and its record and artifacts are saved. */
+  onFinished: (job: Job) => void = () => {};
   constructor(
     private store: Store,
     private changed: Changed,
@@ -50,6 +53,8 @@ export class Jobs {
         cwd: project.path,
       },
     });
+    // Compared after the command ends to find the files it produced.
+    const before = await scanWorkspace(project.path);
     const env = { ...process.env };
     delete env.AGENTIC_TOKEN;
     const child = spawn(command, {
@@ -88,10 +93,12 @@ export class Jobs {
         job.endedAt = Date.now();
         job.exitCode = code;
         if (job.status === 'running') job.status = code === 0 ? 'completed' : 'failed';
-        save();
         persist = persist
-          .then(() =>
-            this.store.appendExecution({
+          .then(async () => {
+            const files = await captureArtifacts(project.path, before);
+            job.artifacts = files.map((file) => file.path!);
+            await this.store.put('jobs', { ...job });
+            await this.store.appendExecution({
               id: randomUUID(),
               projectId: project.id,
               sessionId,
@@ -107,13 +114,17 @@ export class Jobs {
               createdAt: job.endedAt!,
               exitCode: code,
               durationMs: job.endedAt! - job.createdAt,
-            }),
-          )
+              files,
+            });
+          })
           // The command may have written files; its completion is listed with research executions.
-          .then(() => this.changed({ files: [project.id], research: [project.id] }));
+          .then(() =>
+            this.changed({ files: [project.id], research: [project.id], jobs: [project.id] }),
+          );
         void persist.finally(() => {
           this.children.delete(job.id);
           resolve();
+          this.onFinished({ ...job });
         });
       });
     });

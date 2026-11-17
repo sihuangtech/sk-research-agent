@@ -62,5 +62,20 @@
   "modelCatalogFailed": "無法載入帳號模型，請檢查登入後重試。",
   "signOutFirst": "請先登出再移除此連線。",
   "connectionTestFailed": "連線測試失敗，請檢查已儲存的模型、憑證與供應商額度。",
-  "interactivePlanOnly": "此方案僅用於互動任務；排程工作請選擇 API 或本機模型。"
+  "interactivePlanOnly": "此方案僅用於互動任務；排程工作請選擇 API 或本機模型。",
+  "guardProtected": "此路徑受保護（唯讀）。如確需修改，請研究者在「守護」面板解除保護。",
+  "guardDenied": "研究者沒有核准這項操作。請勿改用其他方式繞過，請說明原因並詢問下一步。",
+  "guardUnattended": "這是無人值守的執行，需要研究者核准的操作不會執行。請在報告中說明需要做什麼，留給研究者決定。",
+  "memoryProposeLabel": "提議記憶",
+  "memoryProposeDescription": "提議記住關於研究者的穩定偏好或背景（稱呼、研究方向、常用工具、寫作風格、截止日期等），並說明理由。研究者確認後才會生效。請勿用於臨時推測或研究結論。",
+  "memoryProposalLimit": "已有 5 則待確認的記憶提議，請等研究者處理後再提議。",
+  "memoryProposedNote": "已提交給研究者確認；確認前不會使用。",
+  "reportSaveLabel": "儲存報告",
+  "reportSaveDescription": "將 Markdown 報告儲存到專案的 reports 目錄。每個結論都要以 [#紀錄編號前 8 碼] 引用研究紀錄；引用不存在的紀錄會被拒絕。",
+  "reportCitationsMissing": "這些引用找不到對應的研究紀錄：{{ids}}。請改為真實紀錄的編號，或刪除沒有依據的結論。",
+  "reportCitationsRequired": "報告沒有引用任何研究紀錄。請以 [#紀錄編號前 8 碼] 標註每項結論的依據。",
+  "reportNoRecords": "這段期間內還沒有研究紀錄，暫時無法產生報告。",
+  "checkpointBusy": "專案中仍有工作階段正在執行，請等它結束或停止後再還原。",
+  "checkpointUnavailable": "無法建立檢查點：需要已安裝 Git，專案檔案不超過 2 萬個，且受保護路徑以外的內容不超過 1 GB。",
+  "protectedPathInvalid": "請填寫專案內已存在的檔案或資料夾路徑（不能是專案根目錄）。"
 }

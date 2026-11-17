@@ -18,6 +18,7 @@ export default function ResearchEntryCard({
   onEdit: () => void;
 }) {
   const { t } = useTranslation();
+  const { t: partner } = useTranslation('partner');
   const { setSessionId, setRequestedFile, setPanel, act } = useWorkbench();
   const [checked, setChecked] = useState<CheckedSource[]>([]);
   const [checking, setChecking] = useState(false);
@@ -30,7 +31,8 @@ export default function ResearchEntryCard({
       <h3>{entry.title}</h3>
       <small>
         {formatDate(entry.createdAt)} ·{' '}
-        {t(entry.author === 'user' ? 'researchUser' : 'researchAgent')}
+        {t(entry.author === 'user' ? 'researchUser' : 'researchAgent')} ·{' '}
+        {partner('recordId', { id: entry.id.slice(0, 8) })}
       </small>
       {entry.author === 'agent' && <p className="research-unreviewed">{t('researchUnreviewed')}</p>}
       <p className="research-note-text">{entry.content}</p>

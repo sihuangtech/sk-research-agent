@@ -6,9 +6,12 @@ import type { AgentMessage } from '@earendil-works/pi-agent-core';
 import { type AgentSession, SessionManager } from '@earendil-works/pi-coding-agent';
 import type { Conversation, SessionSnapshot } from '../shared/contracts.js';
 import type { Locale } from '../shared/locale.js';
-import { presentMessages } from './agent/messages.js';
+import type { ReportKind, ToolProfile } from '../shared/partner.js';
+import { Approvals, createGuard, installGuard } from './agent/guard.js';
+import { eventSummary, presentMessages } from './agent/messages.js';
 import { createResearchSession } from './agent/runtime.js';
 import type { Changed } from './changes.js';
+import { Checkpoints } from './checkpoints.js';
 import { DomainError } from './errors.js';
 import type { Jobs } from './jobs.js';
 import { type SecretStore } from './providers.js';
@@ -28,16 +31,30 @@ interface LiveSession {
   aborting: boolean;
   audit?: ExecutionAudit;
 }
+export interface TurnOptions {
+  profile?: ToolProfile;
+  reportKind?: ReportKind;
+  /** Scheduled or follow-up turns: risky actions are refused instead of waiting for approval. */
+  unattended?: boolean;
+}
 export class ResearchAgent {
   private live = new Map<string, LiveSession>();
   private closing = false;
+  readonly approvals: Approvals;
+  readonly checkpoints: Checkpoints;
   constructor(
     private store: Store,
     private jobs: Jobs,
     private secrets: SecretStore,
     private dataDir: string,
     private changed: Changed,
-  ) {}
+  ) {
+    this.approvals = new Approvals(changed);
+    this.checkpoints = new Checkpoints(store, dataDir);
+  }
+  isRunning(id: string) {
+    return this.live.has(id);
+  }
   async recover() {
     for (const session of await this.store.list('sessions'))
       if (session.status === 'running') {
@@ -99,6 +116,7 @@ export class ResearchAgent {
       messages: presented.slice(from),
       activeTools: [...(live?.activeTools || [])],
       queued: live?.queued || [],
+      approvals: this.approvals.list(id),
     };
   }
   async prompt(
@@ -106,7 +124,9 @@ export class ResearchAgent {
     text: string,
     mode: 'prompt' | 'steer' | 'followUp' = 'prompt',
     locale: Locale = 'zh-CN',
+    options: TurnOptions = {},
   ) {
+    const visible = eventSummary(text) ?? text;
     if (this.closing) throw new DomainError('agentClosing');
     const active = this.live.get(id);
     if (active) {
@@ -115,7 +135,7 @@ export class ResearchAgent {
           statusCode: 409,
         });
       await active.session[mode](text);
-      active.queued.push(text);
+      active.queued.push(visible);
       this.changed({ sessions: [id] });
       return;
     }
@@ -139,8 +159,14 @@ export class ResearchAgent {
         error: undefined,
         errorCode: undefined,
         updatedAt: Date.now(),
-        title: record.title || text.slice(0, 44),
+        locale,
+        title: record.title || visible.slice(0, 44),
       });
+      const { projectId } = record;
+      const project = await this.store.get('projects', projectId);
+      const profile = options.profile || 'full';
+      // Turns that can change files start from a checkpoint the researcher can restore.
+      if (profile === 'full') await this.checkpoints.create(project, id, visible).catch(() => null);
       const session = await createResearchSession(
         this.store,
         this.jobs,
@@ -149,14 +175,26 @@ export class ResearchAgent {
         record,
         id,
         locale,
-        text,
+        visible,
         this.changed,
+        { profile, reportKind: options.reportKind },
       );
       state.session = session;
-      const { projectId } = record;
-      const project = await this.store.get('projects', projectId);
-      state.audit = new ExecutionAudit(this.store, projectId, id, project.path, () =>
+      const audit = new ExecutionAudit(this.store, projectId, id, project.path, () =>
         this.changed({ research: [projectId] }),
+      );
+      state.audit = audit;
+      installGuard(
+        session.agent,
+        createGuard({
+          approvals: this.approvals,
+          sessionId: id,
+          projectId,
+          protectedPaths: project.protectedPaths || [],
+          unattended: Boolean(options.unattended),
+          locale,
+          allowed: (callId, tool) => audit.prepare(callId, tool),
+        }),
       );
       await this.store.put('sessions', {
         ...(await this.store.get('sessions', id)),
@@ -175,7 +213,7 @@ export class ResearchAgent {
         const files = event.type === 'tool_execution_end' ? [projectId] : [];
         this.changed({ sessions: [id], files });
       });
-      state.done = this.run(id, text, session, state);
+      state.done = this.run(id, text, visible, session, state);
       this.changed({ overview: true, sessions: [id] });
     } catch (error) {
       state.session?.dispose();
@@ -194,7 +232,13 @@ export class ResearchAgent {
       ready();
     }
   }
-  private async run(id: string, text: string, session: AgentSession, state: LiveSession) {
+  private async run(
+    id: string,
+    text: string,
+    visible: string,
+    session: AgentSession,
+    state: LiveSession,
+  ) {
     let error: string | undefined;
     try {
       if (!state.aborting) await session.prompt(text);
@@ -205,7 +249,13 @@ export class ResearchAgent {
     } finally {
       try {
         await state.audit?.finish();
-        await saveHandoff(this.store, id, text, session.messages, state.aborting || Boolean(error));
+        await saveHandoff(
+          this.store,
+          id,
+          visible,
+          session.messages,
+          state.aborting || Boolean(error),
+        );
       } catch (recordError) {
         error = String(recordError);
       }
@@ -221,7 +271,12 @@ export class ResearchAgent {
       this.live.delete(id);
       // The handoff is a research record; the turn may have written files.
       const project = [finished.projectId];
-      this.changed({ overview: true, sessions: [id], files: project, research: project });
+      const kind = error && !state.aborting ? 'turnFailed' : 'turnFinished';
+      const subject = finished.title || visible;
+      const alerts = state.aborting
+        ? []
+        : [{ kind, projectId: finished.projectId, sessionId: id, subject } as const];
+      this.changed({ overview: true, sessions: [id], files: project, research: project, alerts });
     }
   }
   async abort(id: string) {
@@ -234,6 +289,7 @@ export class ResearchAgent {
   }
   async stop() {
     this.closing = true;
+    this.approvals.denyAll();
     await Promise.all([...this.live.keys()].map((id) => this.abort(id)));
   }
 }

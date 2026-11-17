@@ -62,5 +62,20 @@
   "modelCatalogFailed": "모델을 불러오지 못했습니다. 로그인 상태를 확인하세요.",
   "signOutFirst": "연결을 제거하기 전에 로그아웃하세요.",
   "connectionTestFailed": "연결 테스트에 실패했습니다. 저장된 모델, 인증 정보, 한도를 확인하세요.",
-  "interactivePlanOnly": "이 요금제는 대화형 전용입니다. 예약 작업은 API 또는 로컬 모델을 선택하세요."
+  "interactivePlanOnly": "이 요금제는 대화형 전용입니다. 예약 작업은 API 또는 로컬 모델을 선택하세요.",
+  "guardProtected": "이 경로는 보호되어 있습니다(읽기 전용). 꼭 수정해야 한다면 연구자가 ‘보호’ 패널에서 보호를 해제해야 합니다.",
+  "guardDenied": "연구자가 이 작업을 승인하지 않았습니다. 다른 방법으로 우회하지 말고 이유를 설명한 뒤 다음 단계를 물어보세요.",
+  "guardUnattended": "무인 실행이므로 연구자 승인이 필요한 작업은 실행되지 않습니다. 필요한 작업을 보고에 적고 결정은 연구자에게 맡기세요.",
+  "memoryProposeLabel": "기억 제안",
+  "memoryProposeDescription": "연구자에 관한 안정적인 선호나 배경(호칭, 연구 분야, 자주 쓰는 도구, 글쓰기 스타일, 마감일 등)을 이유와 함께 기억으로 제안합니다. 연구자가 확인한 뒤에만 적용됩니다. 임시 추측이나 연구 결론에는 사용하지 마세요.",
+  "memoryProposalLimit": "확인 대기 중인 기억 제안이 이미 5개 있습니다. 연구자가 처리할 때까지 기다려 주세요.",
+  "memoryProposedNote": "연구자 확인을 요청했습니다. 확인 전에는 사용되지 않습니다.",
+  "reportSaveLabel": "보고서 저장",
+  "reportSaveDescription": "Markdown 보고서를 프로젝트의 reports 폴더에 저장합니다. 모든 결론은 [#기록 ID 앞 8자리]로 연구 기록을 인용해야 하며, 존재하지 않는 기록 인용은 거부됩니다.",
+  "reportCitationsMissing": "다음 인용과 일치하는 연구 기록이 없습니다: {{ids}}. 실제 기록 ID로 고치거나 근거 없는 결론을 삭제하세요.",
+  "reportCitationsRequired": "보고서가 연구 기록을 하나도 인용하지 않았습니다. 각 결론의 근거를 [#기록 ID 앞 8자리]로 표시하세요.",
+  "reportNoRecords": "이 기간에는 아직 연구 기록이 없어 보고서를 만들 수 없습니다.",
+  "checkpointBusy": "이 프로젝트에서 아직 실행 중인 세션이 있습니다. 끝나거나 중지한 뒤 복원하세요.",
+  "checkpointUnavailable": "체크포인트를 만들 수 없습니다. Git이 설치되어 있어야 하고, 프로젝트 파일이 2만 개 이하, 보호 경로 밖 용량이 1GB 이하여야 합니다.",
+  "protectedPathInvalid": "프로젝트 안에 있는 파일 또는 폴더 경로를 입력하세요(프로젝트 루트는 불가)."
 }

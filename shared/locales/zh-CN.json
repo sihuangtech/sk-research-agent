@@ -62,5 +62,20 @@
   "modelCatalogFailed": "无法加载账号的模型，请检查登录后重试。",
   "signOutFirst": "请先退出登录，再移除此连接。",
   "connectionTestFailed": "连接测试失败，请检查已保存的模型、凭据和供应商额度。",
-  "interactivePlanOnly": "此套餐仅用于交互任务；定时任务请选择 API 或本地模型连接。"
+  "interactivePlanOnly": "此套餐仅用于交互任务；定时任务请选择 API 或本地模型连接。",
+  "guardProtected": "此路径受保护（只读）。如确需修改，请研究者在“守护”面板解除保护。",
+  "guardDenied": "研究者没有批准这项操作。不要换一种方式绕过，请说明原因并询问下一步。",
+  "guardUnattended": "这是无人值守的运行，需要研究者批准的操作不会执行。请在汇报中说明需要做什么，留给研究者决定。",
+  "memoryProposeLabel": "提议记忆",
+  "memoryProposeDescription": "提议记住关于研究者的稳定偏好或背景（称呼、研究方向、常用工具、写作风格、截止日期等），并说明理由。研究者确认后才会生效。不要用于临时推测或研究结论。",
+  "memoryProposalLimit": "已有 5 条待确认的记忆提议，请等研究者处理后再提议。",
+  "memoryProposedNote": "已提交给研究者确认；确认前不会使用。",
+  "reportSaveLabel": "保存汇报",
+  "reportSaveDescription": "把 Markdown 汇报保存到项目的 reports 目录。每个结论都要用 [#记录编号前 8 位] 引用研究记录；引用不存在的记录会被拒绝。",
+  "reportCitationsMissing": "这些引用找不到对应的研究记录：{{ids}}。请改为真实记录的编号，或删除无依据的结论。",
+  "reportCitationsRequired": "汇报没有引用任何研究记录。请用 [#记录编号前 8 位] 标注每条结论的依据。",
+  "reportNoRecords": "这段时间内还没有研究记录，暂时无法生成汇报。",
+  "checkpointBusy": "项目中还有会话正在运行，请等它结束或停止后再恢复。",
+  "checkpointUnavailable": "无法创建检查点：需要已安装 Git，项目文件不超过 2 万个，且受保护路径以外的内容不超过 1 GB。",
+  "protectedPathInvalid": "请填写项目内已存在的文件或文件夹路径（不能是项目根目录）。"
 }

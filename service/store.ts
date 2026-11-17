@@ -13,6 +13,7 @@ import type {
   Provider,
 } from '../shared/contracts.js';
 import { DomainError } from './errors.js';
+import type { Checkpoint } from '../shared/partner.js';
 import type { ExecutionEvent, ResearchEntry } from '../shared/research.js';
 
 // Business records only. Pi JSONL remains the sole source of conversation history.
@@ -29,6 +30,7 @@ interface Collections {
   jobs: Job;
   automations: Automation;
   research: ResearchEntry;
+  checkpoints: Checkpoint;
 }
 export class Store {
   private constructor(

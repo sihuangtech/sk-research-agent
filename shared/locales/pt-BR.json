@@ -62,5 +62,20 @@
   "modelCatalogFailed": "Não foi possível carregar os modelos. Confira o login.",
   "signOutFirst": "Saia da conta antes de remover a conexão.",
   "connectionTestFailed": "O teste falhou. Confira o modelo salvo, as credenciais e os limites.",
-  "interactivePlanOnly": "Este plano é interativo. Use API ou modelo local para tarefas agendadas."
+  "interactivePlanOnly": "Este plano é interativo. Use API ou modelo local para tarefas agendadas.",
+  "guardProtected": "Este caminho está protegido (somente leitura). Se for realmente necessário alterá-lo, a pessoa pesquisadora pode remover a proteção no painel Proteção.",
+  "guardDenied": "A pessoa pesquisadora não aprovou esta ação. Não a contorne de outra forma; explique o motivo e pergunte como seguir.",
+  "guardUnattended": "Esta execução é sem supervisão, então ações que exigem aprovação não são realizadas. Descreva no relatório o que seria necessário e deixe a decisão para a pessoa pesquisadora.",
+  "memoryProposeLabel": "Propor memória",
+  "memoryProposeDescription": "Propõe lembrar uma preferência ou um fato estável sobre a pessoa pesquisadora (como chamá-la, área, ferramentas usuais, estilo de escrita, prazos), com um motivo. Só vale após a confirmação dela. Não use para suposições nem conclusões de pesquisa.",
+  "memoryProposalLimit": "Já há cinco propostas de memória pendentes; aguarde a pessoa pesquisadora revisá-las.",
+  "memoryProposedNote": "Enviado para confirmação; não é usado até ser confirmado.",
+  "reportSaveLabel": "Salvar relatório",
+  "reportSaveDescription": "Salva um relatório em Markdown na pasta reports do projeto. Cada conclusão deve citar um registro de pesquisa como [#8 primeiros caracteres do ID]; citações de registros inexistentes são recusadas.",
+  "reportCitationsMissing": "Nenhum registro corresponde a estas citações: {{ids}}. Use os IDs de registros reais ou remova as conclusões sem apoio.",
+  "reportCitationsRequired": "O relatório não cita nenhum registro. Indique a base de cada conclusão como [#8 primeiros caracteres do ID].",
+  "reportNoRecords": "Ainda não há registros de pesquisa neste período, então não é possível gerar um relatório.",
+  "checkpointBusy": "Ainda há uma sessão em andamento neste projeto. Aguarde terminar ou pare-a antes de restaurar.",
+  "checkpointUnavailable": "Não foi possível criar o ponto de restauração: requer Git, no máximo 20.000 arquivos e no máximo 1 GB fora dos caminhos protegidos.",
+  "protectedPathInvalid": "Informe um arquivo ou pasta existente dentro do projeto (não a raiz)."
 }

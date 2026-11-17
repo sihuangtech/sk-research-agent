@@ -62,5 +62,20 @@
   "modelCatalogFailed": "Could not load the account's models. Check sign-in and try again.",
   "signOutFirst": "Sign out before removing this connection.",
   "connectionTestFailed": "Connection test failed. Check the saved model, credentials and provider limits.",
-  "interactivePlanOnly": "This plan is reserved for interactive use; choose an API or local connection for scheduled work."
+  "interactivePlanOnly": "This plan is reserved for interactive use; choose an API or local connection for scheduled work.",
+  "guardProtected": "This path is protected (read-only). The researcher can lift the protection in the Safeguards panel if a change is really needed.",
+  "guardDenied": "The researcher did not approve this action. Do not work around it another way; explain why and ask what to do next.",
+  "guardUnattended": "This run is unattended, so actions that need the researcher's approval are not carried out. Describe what is needed in your report and leave the decision to them.",
+  "memoryProposeLabel": "Propose memory",
+  "memoryProposeDescription": "Propose remembering a stable preference or fact about the researcher (name to use, field, usual tools, writing style, deadlines) with a reason. It takes effect only after the researcher confirms. Not for guesses or research conclusions.",
+  "memoryProposalLimit": "Five memory proposals are already waiting; wait for the researcher to review them first.",
+  "memoryProposedNote": "Sent to the researcher for confirmation; it is not used until confirmed.",
+  "reportSaveLabel": "Save report",
+  "reportSaveDescription": "Save a Markdown report to the project's reports folder. Every conclusion must cite a research record as [#first 8 characters of its ID]; citations of records that do not exist are rejected.",
+  "reportCitationsMissing": "No research record matches these citations: {{ids}}. Use the IDs of real records or remove the unsupported conclusions.",
+  "reportCitationsRequired": "The report cites no research records. Mark the basis of each conclusion as [#first 8 characters of the record ID].",
+  "reportNoRecords": "There are no research records in this period yet, so no report can be written.",
+  "checkpointBusy": "A session in this project is still running. Wait for it to finish or stop it before restoring.",
+  "checkpointUnavailable": "Could not create a checkpoint. It needs Git installed, at most 20,000 project files, and at most 1 GB outside protected paths.",
+  "protectedPathInvalid": "Enter an existing file or folder inside the project (not the project root)."
 }

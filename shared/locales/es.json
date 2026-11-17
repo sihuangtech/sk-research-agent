@@ -62,5 +62,20 @@
   "modelCatalogFailed": "No se pudieron cargar los modelos. Revisa el inicio de sesión.",
   "signOutFirst": "Cierra sesión antes de eliminar esta conexión.",
   "connectionTestFailed": "La prueba falló. Revisa el modelo guardado, las credenciales y los límites.",
-  "interactivePlanOnly": "Este plan es interactivo. Usa una API o un modelo local para tareas programadas."
+  "interactivePlanOnly": "Este plan es interactivo. Usa una API o un modelo local para tareas programadas.",
+  "guardProtected": "Esta ruta está protegida (solo lectura). Si de verdad hace falta cambiarla, la persona investigadora puede quitar la protección en el panel Protección.",
+  "guardDenied": "La persona investigadora no aprobó esta acción. No la eludas de otra forma; explica el motivo y pregunta cómo seguir.",
+  "guardUnattended": "Esta ejecución es desatendida, así que las acciones que requieren aprobación no se realizan. Describe en tu informe lo que haría falta y deja la decisión a la persona investigadora.",
+  "memoryProposeLabel": "Proponer recuerdo",
+  "memoryProposeDescription": "Propone recordar una preferencia o un dato estable de la persona investigadora (cómo llamarla, campo, herramientas habituales, estilo de escritura, plazos), con un motivo. Solo se aplica tras su confirmación. No sirve para suposiciones ni conclusiones de investigación.",
+  "memoryProposalLimit": "Ya hay cinco propuestas de recuerdo pendientes; espera a que la persona investigadora las revise.",
+  "memoryProposedNote": "Enviado para confirmación; no se usa hasta que se confirme.",
+  "reportSaveLabel": "Guardar informe",
+  "reportSaveDescription": "Guarda un informe en Markdown en la carpeta reports del proyecto. Cada conclusión debe citar un registro de investigación como [#primeros 8 caracteres del ID]; se rechazan las citas de registros inexistentes.",
+  "reportCitationsMissing": "Ningún registro coincide con estas citas: {{ids}}. Usa los ID de registros reales o elimina las conclusiones sin respaldo.",
+  "reportCitationsRequired": "El informe no cita ningún registro. Indica el respaldo de cada conclusión como [#primeros 8 caracteres del ID].",
+  "reportNoRecords": "Aún no hay registros de investigación en este periodo, así que no se puede redactar un informe.",
+  "checkpointBusy": "Aún hay una sesión en curso en este proyecto. Espera a que termine o detenla antes de restaurar.",
+  "checkpointUnavailable": "No se pudo crear el punto de restauración: requiere Git, como máximo 20 000 archivos y como máximo 1 GB fuera de las rutas protegidas.",
+  "protectedPathInvalid": "Indica un archivo o carpeta existente dentro del proyecto (no la raíz)."
 }

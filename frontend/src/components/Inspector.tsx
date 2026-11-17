@@ -1,4 +1,4 @@
-import { BookOpen, Brain, Clock3, Folder, Terminal } from 'lucide-react';
+import { BookOpen, Brain, Clock3, Folder, ShieldCheck, Terminal } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useWorkbench } from '../state/WorkbenchContext';
 import AutomationsPanel from './AutomationsPanel';
@@ -6,9 +6,11 @@ import FilePanel from './FilePanel';
 import JobsPanel from './JobsPanel';
 import MemoryPanel from './MemoryPanel';
 import ResearchPanel from './ResearchPanel';
+import SafeguardsPanel from './SafeguardsPanel';
 
 export default function Inspector() {
   const { t } = useTranslation();
+  const { t: partner } = useTranslation('partner');
 
   const { panel, setPanel, project, filesRevision, setError, requestedFile } = useWorkbench();
   return (
@@ -21,11 +23,17 @@ export default function Inspector() {
             ['jobs', Terminal, t('jobs')],
             ['memory', Brain, t('memory')],
             ['automations', Clock3, t('automations')],
+            ['safeguards', ShieldCheck, partner('tab')],
           ] as const
         ).map(([key, Icon, label]) => (
-          <button className={panel === key ? 'active' : ''} onClick={() => setPanel(key)} key={key}>
+          <button
+            className={panel === key ? 'active' : ''}
+            onClick={() => setPanel(key)}
+            key={key}
+            title={label}
+          >
             <Icon size={15} />
-            {label}
+            <span>{label}</span>
           </button>
         ))}
       </div>
@@ -42,6 +50,7 @@ export default function Inspector() {
       {panel === 'jobs' && <JobsPanel />}
       {panel === 'memory' && <MemoryPanel />}
       {panel === 'automations' && <AutomationsPanel />}
+      {panel === 'safeguards' && <SafeguardsPanel key={project?.id} />}
     </aside>
   );
 }

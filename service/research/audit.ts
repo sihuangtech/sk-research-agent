@@ -3,6 +3,7 @@ import type { AgentSessionEvent } from '@earendil-works/pi-coding-agent';
 import type { ExecutionEvent } from '../../shared/research.js';
 import type { Store } from '../store.js';
 import { snapshotFile } from './sources.js';
+import { captureArtifacts, scanWorkspace, type WorkspaceScan } from './workspace.js';
 
 export function auditArguments(args: unknown): Record<string, unknown> {
   if (!args || typeof args !== 'object') return {};
@@ -23,6 +24,7 @@ export function auditArguments(args: unknown): Record<string, unknown> {
 }
 export class ExecutionAudit {
   private pending = new Map<string, { tool: string; args: Record<string, unknown> }>();
+  private scans = new Map<string, Promise<WorkspaceScan>>();
   private queue = Promise.resolve();
   private failure?: unknown;
   private runId = randomUUID();
@@ -33,6 +35,13 @@ export class ExecutionAudit {
     private root: string,
     private appended: () => void = () => {},
   ) {}
+  /** Scans the project before a shell command runs, so the files it produces can be found. */
+  async prepare(toolCallId: string, tool: string) {
+    if (!['bash', 'powershell'].includes(tool)) return;
+    const scan = scanWorkspace(this.root);
+    this.scans.set(toolCallId, scan);
+    await scan;
+  }
   observe(event: AgentSessionEvent) {
     if (event.type !== 'tool_execution_start' && event.type !== 'tool_execution_end') return;
     const timestamp = Date.now();
@@ -58,10 +67,13 @@ export class ExecutionAudit {
             ['write', 'edit'].includes(event.toolName) &&
             typeof start?.args.path === 'string'
           ) {
-            // Only these tool targets are observed. Shell-generated outputs require explicit registration.
             const file = await snapshotFile(this.root, start.args.path).catch(() => null);
             if (file) files = [file];
           }
+          const before = this.scans.get(event.toolCallId);
+          this.scans.delete(event.toolCallId);
+          // Shell output files are found by comparing the workspace with the scan taken before.
+          if (before) files = await captureArtifacts(this.root, await before);
           await this.append({
             ...base,
             phase: event.isError ? 'failed' : 'completed',

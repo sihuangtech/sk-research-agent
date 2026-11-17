@@ -5,8 +5,10 @@ import { useWorkbench } from '../state/WorkbenchContext';
 
 export default function MemoryPanel() {
   const { t } = useTranslation();
+  const { t: partner } = useTranslation('partner');
 
   const { data, projectId, project, act } = useWorkbench();
+  const visible = data.memories.filter((m) => !m.projectId || m.projectId === projectId);
   return (
     <section className="panel-content">
       <h2>{t('memoryTitle')}</h2>
@@ -40,8 +42,28 @@ export default function MemoryPanel() {
           {t('saveMemory')}
         </button>
       </form>
-      {data.memories
-        .filter((m) => !m.projectId || m.projectId === projectId)
+      {visible
+        .filter((m) => m.status === 'proposed')
+        .map((m) => (
+          <div className="record memory-proposal" key={m.id}>
+            <small>{partner('proposedTitle')}</small>
+            <p>{m.content}</p>
+            {m.reason && <small>{partner('proposedReason', { reason: m.reason })}</small>}
+            <div className="record-actions">
+              <button
+                className="primary"
+                onClick={() => void act(() => request(`/memories/${m.id}/confirm`, 'POST'))}
+              >
+                {partner('confirmMemory')}
+              </button>
+              <button onClick={() => void act(() => request(`/memories/${m.id}`, 'DELETE'))}>
+                {partner('dismissMemory')}
+              </button>
+            </div>
+          </div>
+        ))}
+      {visible
+        .filter((m) => m.status !== 'proposed')
         .map((m) => (
           <div className="record" key={m.id}>
             <small>

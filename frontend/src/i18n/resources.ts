@@ -9,6 +9,7 @@ import pt from './locales/pt-BR.json';
 import ru from './locales/ru.json';
 import zh from './locales/zh-CN.json';
 import tw from './locales/zh-TW.json';
+import { partnerCatalogs } from './partner';
 import { settingsCatalogs } from './settings';
 
 export const uiCatalogs = {
@@ -30,6 +31,7 @@ export const resources = Object.fromEntries(
       translation,
       service: serviceCatalogs[locale as keyof typeof serviceCatalogs],
       settings: settingsCatalogs[locale as keyof typeof settingsCatalogs],
+      partner: partnerCatalogs[locale as keyof typeof partnerCatalogs],
     },
   ]),
 );

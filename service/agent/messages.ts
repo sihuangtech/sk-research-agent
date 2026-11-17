@@ -3,6 +3,12 @@ import type { ChatMessage } from '../../shared/contracts.js';
 import type { Locale } from '../../shared/locale.js';
 import { message as translate } from '../errors.js';
 
+/** Starts prompts the app sends itself, e.g. after a background job ends. */
+export const eventMarker = '[[second-moon:event]]\n';
+/** The one-line summary of an app-initiated prompt, or null for the researcher's own words. */
+export function eventSummary(text: string) {
+  return text.startsWith(eventMarker) ? text.slice(eventMarker.length).split('\n')[0] : null;
+}
 export function presentMessages(messages: AgentMessage[], locale: Locale = 'zh-CN'): ChatMessage[] {
   return messages
     .map((message, index) => {
@@ -29,11 +35,13 @@ export function presentMessages(messages: AgentMessage[], locale: Locale = 'zh-C
               )
               .filter(Boolean)
               .join('\n');
+      // App-initiated prompts show only their summary; the instructions stay in the history.
+      const event = m.role === 'user' ? eventSummary(text) : null;
       return {
         // History index plus timestamp: compaction or a different history changes the key.
         key: `${index}:${m.timestamp ?? ''}:${m.role}`,
-        role: m.role,
-        text: text || m.errorMessage || '',
+        role: event === null ? m.role : 'event',
+        text: event ?? (text || m.errorMessage || ''),
         toolName: m.toolName,
         isError: m.isError || Boolean(m.errorMessage),
       };

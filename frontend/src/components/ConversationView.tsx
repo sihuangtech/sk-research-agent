@@ -2,6 +2,7 @@ import { ChevronRight, RefreshCw, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatError } from '../i18n';
 import { useWorkbench } from '../state/WorkbenchContext';
+import AlertCards from './AlertCards';
 import Composer from './Composer';
 import Messages from './Messages';
 import Welcome from './Welcome';
@@ -41,6 +42,7 @@ export default function ConversationView() {
         <Messages />
       </div>
       <Composer />
+      <AlertCards />
     </main>
   );
 }

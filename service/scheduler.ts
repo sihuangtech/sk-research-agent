@@ -25,7 +25,10 @@ export function createScheduler(store: Store, agent: ResearchAgent, enabled = tr
           nextRunAt: Date.now() + a.intervalMinutes * 60000,
         });
         try {
-          await agent.prompt(session.id, a.prompt, 'prompt', a.locale);
+          await agent.prompt(session.id, a.prompt, 'prompt', a.locale, {
+            profile: a.profile,
+            unattended: true,
+          });
         } catch {
           /* session records its actual failure */
         }

@@ -91,6 +91,7 @@ test('authenticated SSE connects, sends scoped change notices and closes cleanly
       files: [],
       research: [],
       jobs: [],
+      alerts: [],
     });
     await reader.cancel();
   } finally {

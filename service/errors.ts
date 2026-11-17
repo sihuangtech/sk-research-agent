@@ -15,8 +15,12 @@ void translations.init({
   ),
   interpolation: { escapeValue: false },
 });
-export function message(code: MessageCode, locale: Locale = 'zh-CN') {
-  return String(translations.t(code, { lng: locale }));
+export function message(
+  code: MessageCode,
+  locale: Locale = 'zh-CN',
+  values: Record<string, string> = {},
+) {
+  return String(translations.t(code, { lng: locale, ...values }));
 }
 export function requestLocale(request: FastifyRequest) {
   return resolveLocale(request.headers['accept-language']);

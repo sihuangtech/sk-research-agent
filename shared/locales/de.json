@@ -62,5 +62,20 @@
   "modelCatalogFailed": "Kontomodelle konnten nicht geladen werden. Anmeldung prüfen.",
   "signOutFirst": "Vor dem Entfernen bitte abmelden.",
   "connectionTestFailed": "Verbindungstest fehlgeschlagen. Modell, Zugangsdaten und Limits prüfen.",
-  "interactivePlanOnly": "Dieser Tarif ist interaktiv. Für Zeitpläne eine API oder ein lokales Modell wählen."
+  "interactivePlanOnly": "Dieser Tarif ist interaktiv. Für Zeitpläne eine API oder ein lokales Modell wählen.",
+  "guardProtected": "Dieser Pfad ist geschützt (schreibgeschützt). Falls eine Änderung wirklich nötig ist, kann die forschende Person den Schutz im Bereich „Schutz“ aufheben.",
+  "guardDenied": "Die forschende Person hat diese Aktion nicht freigegeben. Umgehe sie nicht auf anderem Weg; erkläre den Grund und frage nach dem nächsten Schritt.",
+  "guardUnattended": "Dieser Lauf ist unbeaufsichtigt, daher werden freigabepflichtige Aktionen nicht ausgeführt. Beschreibe im Bericht, was nötig wäre, und überlasse die Entscheidung der forschenden Person.",
+  "memoryProposeLabel": "Erinnerung vorschlagen",
+  "memoryProposeDescription": "Schlägt vor, eine dauerhafte Vorliebe oder Information über die forschende Person zu merken (Anrede, Fachgebiet, übliche Werkzeuge, Schreibstil, Fristen), mit Begründung. Gilt erst nach ihrer Bestätigung. Nicht für Vermutungen oder Forschungsergebnisse.",
+  "memoryProposalLimit": "Es warten bereits fünf Erinnerungsvorschläge; warte, bis die forschende Person sie geprüft hat.",
+  "memoryProposedNote": "Zur Bestätigung vorgelegt; wird bis dahin nicht verwendet.",
+  "reportSaveLabel": "Bericht speichern",
+  "reportSaveDescription": "Speichert einen Markdown-Bericht im Ordner reports des Projekts. Jede Schlussfolgerung muss einen Forschungseintrag als [#erste 8 Zeichen der ID] zitieren; Zitate nicht vorhandener Einträge werden abgelehnt.",
+  "reportCitationsMissing": "Zu diesen Zitaten gibt es keinen Forschungseintrag: {{ids}}. Verwende IDs echter Einträge oder entferne unbelegte Schlussfolgerungen.",
+  "reportCitationsRequired": "Der Bericht zitiert keinen Forschungseintrag. Belege jede Schlussfolgerung mit [#erste 8 Zeichen der Eintrags-ID].",
+  "reportNoRecords": "In diesem Zeitraum gibt es noch keine Forschungseinträge, daher kann kein Bericht erstellt werden.",
+  "checkpointBusy": "In diesem Projekt läuft noch eine Sitzung. Warte, bis sie fertig ist, oder stoppe sie vor dem Wiederherstellen.",
+  "checkpointUnavailable": "Kein Wiederherstellungspunkt möglich: Benötigt werden Git, höchstens 20.000 Projektdateien und höchstens 1 GB außerhalb geschützter Pfade.",
+  "protectedPathInvalid": "Gib eine vorhandene Datei oder einen Ordner im Projekt an (nicht das Projektstammverzeichnis)."
 }

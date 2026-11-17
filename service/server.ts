@@ -1,6 +1,7 @@
 import { EventEmitter } from 'node:events';
 import Fastify from 'fastify';
 import { ResearchAgent } from './agent.js';
+import { followJobs } from './agent/followups.js';
 import { createChangeFeed } from './changes.js';
 import { DomainError } from './errors.js';
 import { registerEvents } from './http/events.js';
@@ -12,6 +13,7 @@ import { registerFiles } from './routes/files.js';
 import { registerJobs } from './routes/jobs.js';
 import { registerMemories } from './routes/memories.js';
 import { registerOverview } from './routes/overview.js';
+import { registerPartner } from './routes/partner.js';
 import { registerProjects } from './routes/projects.js';
 import { registerProviders } from './routes/providers.js';
 import { registerSessions } from './routes/sessions.js';
@@ -50,6 +52,8 @@ export async function createServer(options: {
   registerMemories(context);
   registerAutomations(context);
   registerResearch(context);
+  registerPartner(context);
+  followJobs(store, jobs, agent, changed);
   const scheduler = createScheduler(store, agent, options.scheduler !== false);
   app.addHook('preClose', async () => {
     feed.close();

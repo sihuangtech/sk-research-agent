@@ -19,8 +19,9 @@ export function createChangeFeed(emit: (notice: ChangeNotice) => void, delayMs =
   };
   const changed: Changed = (change = { overview: true }) => {
     if (closed) return;
-    pending ??= { overview: false, sessions: [], files: [], research: [], jobs: [] };
+    pending ??= { overview: false, sessions: [], files: [], research: [], jobs: [], alerts: [] };
     if (change.overview) pending.overview = true;
+    pending.alerts.push(...(change.alerts || []));
     for (const area of areas)
       for (const id of change[area] || []) if (!pending[area].includes(id)) pending[area].push(id);
     timer ??= setTimeout(flush, delayMs);

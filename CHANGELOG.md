@@ -12,6 +12,37 @@ This log follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [S
 - This pre-1.0 policy is a project convention; SemVer permits an unstable public API during initial development. At `1.0.0`, the public contract will be declared stable: incompatible changes increment MAJOR, compatible features MINOR, and fixes PATCH.
 - Changelog entries record versioned change batches; GitHub Release publication is a separate action requiring approval. Published versions and tags must never be silently reassigned.
 
+## 0.11.0 - 2026-11-18
+
+Second Moon now behaves more like a research partner: it follows up, asks before risky actions, keeps checkpoints and drafts reports from evidence.
+
+### Added
+
+- Partner persona: warm and familiar, but honest about evidence. It does not tell the researcher what they hope to hear and never acts as a romantic partner.
+- Proposed memories: the agent can propose remembering the researcher's name, field, tools or deadlines with a reason. Proposals stay out of the model context until confirmed in the Memory panel.
+- Follow-ups: when a background job the agent started ends, it starts a read-only turn to report what happened and suggest a next step. Subscription and plan connections only notify, because they are interactive-only.
+- Daily research brief: a one-click automation that runs every morning at 08:00, reviews the last 24 hours and lists what still needs verification or a decision. It can only read and record.
+- Alerts: finished or failed turns and jobs, pending approvals and memory proposals appear as in-app cards and as system notifications while the window is in the background (official Tauri notification plugin).
+- Approvals: deleting, installing packages, uploading or sending data, admin rights, piping downloads into a shell and changes near protected paths pause until the researcher allows them once or refuses. Unattended runs refuse such actions instead of waiting.
+- Protected paths: files and folders the agent can read but never change with its file tools. They are also excluded from checkpoints and restores.
+- Checkpoints: a snapshot of project files before every turn that may change them, kept in a separate Git directory under the app data folder. Restore removes later files, never touches protected paths or files over 20 MB, and first saves the current state so the restore can be undone.
+- Safeguards panel for protected paths and checkpoints.
+- Reports: weekly reports and group meeting outlines written from recent research records. Every conclusion must cite a record as `[#first 8 characters of its ID]`; citations of unknown records are rejected, and reports never overwrite earlier ones.
+- Research cards show the record ID that reports cite, and research search finds records by that ID.
+
+### Changed
+
+- Files created or changed by shell commands and background jobs are found by comparing the workspace before and after, fingerprinted and attached to the execution event; the jobs panel lists them.
+- Turns run with a tool profile: full, review (read and record only) or report (review plus saving one report).
+- App-initiated prompts appear as short event notes in the conversation; their instructions stay in the model history only.
+- Inspector tabs show the icon above the label so all six panels stay visible.
+
+### Verification
+
+- Added tests for risk classification, approval and refusal, protected writes, shell artifacts, checkpoint restore and undo, memory confirmation, report citation checks and read-only follow-ups.
+- Walked through the full flow in the browser with a scripted model and a scratch project: memory proposal, approval of a deletion, a background job and its follow-up report, checkpoint restore, a weekly report and the daily brief.
+- Not verified: real model behaviour with these prompts, and system notifications in a packaged desktop build.
+
 ## 0.10.0 - 2026-11-17
 
 Incompatible change to the local service API; the workbench shows the same information.

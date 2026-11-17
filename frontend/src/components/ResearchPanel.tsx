@@ -6,6 +6,7 @@ import { formatDate } from '../i18n';
 import { useWorkbench } from '../state/WorkbenchContext';
 import ResearchEntryCard from './ResearchEntryCard';
 import ResearchEntryForm from './ResearchEntryForm';
+import ReportComposer from './ReportComposer';
 
 export default function ResearchPanel() {
   const { t } = useTranslation();
@@ -83,6 +84,7 @@ export default function ResearchPanel() {
             </button>
             <button onClick={() => void act(exportRecords)}>{t('researchExport')}</button>
           </div>
+          <ReportComposer />
           {view === 'notes' ? (
             <>
               <form
